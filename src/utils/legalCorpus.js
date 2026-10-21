@@ -315,6 +315,52 @@ function extractCitations(text) {
   return found
 }
 
+const ARTICLE_REF_RE = /第\s*([一二三四五六七八九十百千零〇两\d]+)\s*条(之[一二三四五六七八九十]+)?/g
+
+/**
+ * 核对用户提问中提到的“法律 + 条号”是否存在于本地库。
+ * 仅在能唯一确定一部法律时返回结果，避免把条号归到错误的法律上。
+ */
+export async function inspectQueryCitations(text) {
+  await ensureCorpus()
+  const value = (text || '').trim()
+  if (!value) return null
+
+  const normalized = normalizeLawName(value)
+  const lawMatches = new Map()
+  for (const alias of state.aliases) {
+    if (alias.norm.length < 2 || !normalized.includes(alias.norm)) continue
+    const current = lawMatches.get(alias.law.id)
+    if (!current || alias.norm.length > current.matchedLength) {
+      lawMatches.set(alias.law.id, { law: alias.law, matchedLength: alias.norm.length })
+    }
+  }
+  if (lawMatches.size !== 1) return null
+
+  const law = [...lawMatches.values()][0].law
+  const queries = []
+  const seen = new Set()
+  for (const match of value.matchAll(ARTICLE_REF_RE)) {
+    const n = parseCnNumber(match[1])
+    if (!n) continue
+    const suffix = match[2] || ''
+    const key = `${n}-${suffix}`
+    if (seen.has(key)) continue
+    seen.add(key)
+    const article = law.articles.find(item => item.n === n && (item.suffix || '') === suffix) || null
+    queries.push({ n, numberCn: match[1], suffix, article })
+  }
+  if (!queries.length) return null
+
+  return {
+    law,
+    queries,
+    total: law.articles.length,
+    firstNo: law.articles[0]?.no || '',
+    lastNo: law.articles[law.articles.length - 1]?.no || ''
+  }
+}
+
 function findLaw(name) {
   const norm = normalizeLawName(name)
   if (!norm) return null

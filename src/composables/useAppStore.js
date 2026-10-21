@@ -11,8 +11,18 @@ import {
   testConnection,
   chat,
 } from "../api/index.js";
-import { searchLegalArticles, verifyCitations } from "../utils/legalCorpus.js";
+import {
+  searchLegalArticles,
+  verifyCitations,
+  inspectQueryCitations,
+} from "../utils/legalCorpus.js";
 import { searchRelatedCases } from "../utils/legalCases.js";
+
+const LEGAL_CITATION_GUARD = `回答涉及法律条文时，必须遵守：
+1. 只依据后面提供的“本地法条库”资料引用法律名称、条号和条文内容；资料中没有的条号、内容或版本信息，不得凭记忆补充。
+2. 用户提到的条号如果在资料中查无此条，直接说明“本地法条库查无此条/未收录”，不得猜测其内容，也不得用其他条号替代。
+3. 引用格式为《法律全称》第X条；无法确认时标注“待核实”，并提示以国家法律法规数据库官方文本为准。
+4. 不得根据旧版本编号作答；不同修正版本的条号可能不同。`;
 
 // ==================== 导航状态 ====================
 
@@ -118,16 +128,21 @@ function loadSettings() {
   const savedSessions = JSON.parse(
     localStorage.getItem("agnes_chat_sessions") || "[]",
   );
-  chatSessions.value = savedSessions.map((session) => ({
-    ...session,
-    roleId: chatRoles.some((role) => role.id === session.roleId)
+  chatSessions.value = savedSessions.map((session) => {
+    const roleId = chatRoles.some((role) => role.id === session.roleId)
       ? session.roleId
-      : "general",
-    messages: session.messages.map((msg) => ({
-      ...msg,
-      displayContent: msg.displayContent || msg.content,
-    })),
-  }));
+      : "legal";
+    const hasMessages = Array.isArray(session.messages) && session.messages.length > 0;
+    return {
+      ...session,
+      // 空白的“基础问答”会话自动归入默认的法律顾问角色
+      roleId: !hasMessages && roleId === "general" ? "legal" : roleId,
+      messages: session.messages.map((msg) => ({
+        ...msg,
+        displayContent: msg.displayContent || msg.content,
+      })),
+    };
+  });
   // 如果有保存的会话，激活第一个；否则创建新会话
   if (savedSessions.length > 0) {
     currentChatSessionId.value = savedSessions[0].id;
@@ -263,6 +278,9 @@ async function sendMessage(text, attachment = null) {
         role: "system",
         content: role.systemPrompt,
       },
+      ...(role.id === "legal"
+        ? [{ role: "system", content: LEGAL_CITATION_GUARD }]
+        : []),
       ...(legalContext ? [{ role: "system", content: legalContext }] : []),
       ...session.messages.map((m) => ({
         role: m.role,
@@ -352,7 +370,7 @@ function saveChatSessions() {
  * 创建新对话会话
  * @returns {object} 新创建的会话对象
  */
-function createChatSession(roleId = "general") {
+function createChatSession(roleId = "legal") {
   const role = getChatRole(roleId);
   const newSession = {
     id: Date.now(),
@@ -413,7 +431,7 @@ function updateChatSessionTitle(sessionId, title) {
   }
 }
 
-function getChatRole(roleId = "general") {
+function getChatRole(roleId = "legal") {
   return chatRoles.find((role) => role.id === roleId) || chatRoles[0];
 }
 
@@ -423,17 +441,39 @@ function getChatRole(roleId = "general") {
  * @returns {Promise<string>} 法条上下文
  */
 async function buildLegalContext(query) {
-  const results = await searchLegalArticles(query, 8);
-  if (results.length === 0) {
-    return "本地法条库未检索到与当前问题直接相关的条文。回答涉及法条时，只有确认准确时才引用，并给出《法律名称》第X条；无法确认时明确标注“待核实”，不得编造法条、案号或来源。";
+  const [results, citationInfo] = await Promise.all([
+    searchLegalArticles(query, 8),
+    inspectQueryCitations(query),
+  ]);
+
+  const parts = [];
+  if (citationInfo) {
+    const { law, queries, total, firstNo, lastNo } = citationInfo;
+    const lines = queries.map(({ numberCn, suffix, article }) => {
+      const label = `第${numberCn}条${suffix}`;
+      if (article) {
+        return `用户提到《${law.title}》${label}，本地库收录的 ${law.date} 版本中确有该条，原文：\n${article.text.slice(0, 700)}`;
+      }
+      return `用户提到《${law.title}》${label}，但本地库收录的 ${law.date} 版本共 ${total} 条（${firstNo}至${lastNo}），其中查无此条。不得猜测或编造该条内容，也不得用其他条号替代；应明确告知用户本地库查无此条，并提示以国家法律法规数据库的官方文本为准。`;
+    });
+    parts.push(`【用户所问条号核对】\n${lines.join("\n\n")}`);
   }
 
-  const references = results
-    .map((result, index) => {
-      const { law, article } = result;
-      return `【${index + 1}】《${law.title}》${article.no}${article.suffix || ""}${article.chapter ? `（${article.chapter}）` : ""}\n${article.text.slice(0, 700)}`;
-    })
-    .join("\n\n");
+  if (results.length === 0) {
+    parts.push(
+      "本地法条库未检索到与当前问题直接相关的其他条文。回答涉及法条时，只有确认准确时才引用，并给出《法律名称》第X条；无法确认时明确标注“待核实”，不得编造法条、案号或来源。",
+    );
+  } else {
+    const references = results
+      .map((result, index) => {
+        const { law, article } = result;
+        return `【${index + 1}】《${law.title}》${article.no}${article.suffix || ""}${article.chapter ? `（${article.chapter}）` : ""}\n${article.text.slice(0, 700)}`;
+      })
+      .join("\n\n");
+    parts.push(
+      `以下是本地法条库（整理自国家法律法规数据库）检索到的相关条文。请优先依据这些原文回答；引用时必须使用《法律全称》第X条 的格式；若所需条文不在此列表中且无法确认，请明确标注“待核实”，不得编造法条、案号或来源。\n\n${references}`,
+    );
+  }
 
-  return `以下是本地法条库（整理自国家法律法规数据库）检索到的相关条文。请优先依据这些原文回答；引用时必须使用《法律全称》第X条 的格式；若所需条文不在此列表中且无法确认，请明确标注“待核实”，不得编造法条、案号或来源。\n\n${references}`;
+  return parts.join("\n\n");
 }

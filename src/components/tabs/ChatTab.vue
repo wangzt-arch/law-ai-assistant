@@ -7,12 +7,15 @@
           <span class="eyebrow">CASE FILES</span>
           <h3>案卷目录</h3>
         </div>
-        <button class="new-session-btn" @click="rolePickerOpen = true" title="新建对话">
-          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 5v14M5 12h14"/>
-          </svg>
-          <span>新建</span>
-        </button>
+        <div class="sessions-header-actions">
+          <button class="new-session-btn" @click="createRoleSession('legal')" title="新建法律顾问对话">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            <span>新建</span>
+          </button>
+          <button class="role-picker-btn" @click="rolePickerOpen = true" title="选择对话角色">角色</button>
+        </div>
       </div>
       <div class="sessions-list">
         <div
@@ -438,6 +441,12 @@ onMounted(() => {
   letter-spacing: 0.04em;
 }
 
+.sessions-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
 .new-session-btn {
   display: inline-flex;
   align-items: center;
@@ -454,6 +463,20 @@ onMounted(() => {
 
 .new-session-btn:hover {
   color: var(--cinnabar-dark);
+}
+
+.role-picker-btn {
+  padding: 0.2rem 0;
+  background: transparent;
+  border: none;
+  color: var(--ink-muted);
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.role-picker-btn:hover {
+  color: var(--ink);
 }
 
 .sessions-list {
