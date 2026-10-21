@@ -346,3 +346,20 @@ app.on('window-all-closed', function () {
 ipcMain.handle('get-app-version', () => {
   return app.getVersion()
 })
+
+ipcMain.on('set-theme', (event, theme) => {
+  if (!mainWindow || mainWindow.isDestroyed()) return
+  const night = theme === 'night'
+  if (typeof mainWindow.setTitleBarOverlay === 'function') {
+    try {
+      mainWindow.setTitleBarOverlay({
+        color: night ? '#17140f' : '#f4f0e6',
+        symbolColor: night ? '#e9e1d2' : '#1f242b',
+        height: 32
+      })
+    } catch {
+      // 部分平台不支持自定义标题栏
+    }
+  }
+  mainWindow.setBackgroundColor(night ? '#17140f' : '#f4f0e6')
+})

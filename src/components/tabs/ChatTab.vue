@@ -569,7 +569,7 @@ onMounted(() => {
 .session-item {
   padding: 0.7rem 0.9rem;
   border-left: 2px solid transparent;
-  border-bottom: 1px solid rgba(185, 174, 153, 0.35);
+  border-bottom: 1px solid var(--border-subtle);
   cursor: pointer;
   transition: background 0.18s ease, border-color 0.18s ease;
   display: flex;
@@ -579,7 +579,7 @@ onMounted(() => {
 }
 
 .session-item:hover {
-  background: rgba(251, 248, 241, 0.72);
+  background: var(--bg-hover-soft);
 }
 
 .session-item.active {
@@ -780,10 +780,10 @@ onMounted(() => {
 }
 
 .message-item.assistant .message-avatar {
-  background: var(--cinnabar);
-  border-color: var(--cinnabar);
-  color: #fbf8f1;
-  box-shadow: inset 0 0 0 1px rgba(251, 248, 241, 0.45);
+  background: var(--cinnabar-solid);
+  border-color: var(--cinnabar-solid);
+  color: var(--on-accent);
+  box-shadow: inset 0 0 0 1px var(--on-accent-soft);
 }
 
 .message-content {
@@ -848,7 +848,7 @@ onMounted(() => {
   margin-top: 0.55rem;
   padding: 0.22rem 0.5rem;
   background: var(--cinnabar-soft);
-  border: 1px solid rgba(154, 46, 36, 0.16);
+  border: 1px solid var(--accent-border-soft);
   border-radius: var(--radius-sm);
   color: var(--cinnabar-dark);
   font-size: 0.7rem;
@@ -892,7 +892,7 @@ onMounted(() => {
   align-items: flex-start;
   gap: 0.55rem;
   padding: 0.55rem 0;
-  border-bottom: 1px dashed rgba(185, 174, 153, 0.42);
+  border-bottom: 1px dashed var(--border-dashed);
 }
 
 .citation-item:last-of-type {
@@ -905,7 +905,7 @@ onMounted(() => {
 }
 
 .citation-item.clickable:hover {
-  background: rgba(251, 248, 241, 0.72);
+  background: var(--bg-hover-soft);
 }
 
 .citation-item.clickable:focus-visible {
@@ -1027,7 +1027,7 @@ onMounted(() => {
 .case-item {
   display: block;
   padding: 0.6rem 0;
-  border-bottom: 1px dashed rgba(185, 174, 153, 0.42);
+  border-bottom: 1px dashed var(--border-dashed);
   color: inherit;
   text-decoration: none;
 }
@@ -1442,7 +1442,7 @@ onMounted(() => {
   display: grid;
   place-items: center;
   padding: 1.5rem;
-  background: rgba(31, 36, 43, 0.45);
+  background: var(--mask);
   backdrop-filter: blur(4px);
 }
 
@@ -1544,7 +1544,7 @@ onMounted(() => {
   display: grid;
   place-items: center;
   padding: 1.5rem;
-  background: rgba(31, 36, 43, 0.45);
+  background: var(--mask);
   backdrop-filter: blur(4px);
 }
 

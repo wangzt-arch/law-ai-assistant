@@ -34,6 +34,25 @@
   --success: #3f6a4e;
   --warning: #83643a;
   --danger: #9a2e24;
+  --danger-soft: rgba(154, 46, 36, 0.14);
+  --danger-border-soft: rgba(154, 46, 36, 0.25);
+
+  --cinnabar-solid: #9a2e24;
+  --cinnabar-solid-hover: #7c2119;
+  --on-accent: #fbf8f1;
+  --on-accent-soft: rgba(251, 248, 241, 0.45);
+  --on-accent-seal: rgba(251, 248, 241, 0.5);
+  --bg-header: rgba(244, 240, 230, 0.92);
+  --bg-hover-soft: rgba(251, 248, 241, 0.72);
+  --border-subtle: rgba(185, 174, 153, 0.35);
+  --border-dashed: rgba(185, 174, 153, 0.42);
+  --mask: rgba(31, 36, 43, 0.45);
+  --selection-bg: rgba(154, 46, 36, 0.16);
+  --accent-border-soft: rgba(154, 46, 36, 0.16);
+  --success-soft: rgba(63, 106, 78, 0.08);
+  --success-border: rgba(63, 106, 78, 0.24);
+  --texture-opacity: 1;
+  color-scheme: light;
 
   --shadow-sm: 0 1px 2px rgba(31, 36, 43, 0.04);
   --shadow-md: 0 8px 24px rgba(31, 36, 43, 0.06);
@@ -49,11 +68,65 @@
   --font-mono: "JetBrains Mono", "SFMono-Regular", Consolas, "Liberation Mono", monospace;
 }
 
+/* ===== Night Reading Theme ===== */
+:root[data-theme="night"] {
+  color-scheme: dark;
+
+  --bg-primary: #17140f;
+  --bg-secondary: #1e1a14;
+  --bg-tertiary: #262119;
+  --bg-card: #211d17;
+  --bg-card-hover: #29241c;
+  --bg-input: #1b1711;
+  --bg-input-focus: #242017;
+  --bg-header: rgba(23, 20, 15, 0.92);
+  --bg-hover-soft: rgba(251, 245, 234, 0.05);
+
+  --ink: #e9e1d2;
+  --ink-secondary: #bcb19f;
+  --ink-muted: #8f8576;
+
+  --cinnabar: #de7b67;
+  --cinnabar-dark: #f09783;
+  --cinnabar-soft: rgba(222, 123, 103, 0.14);
+  --cinnabar-solid: #a63f34;
+  --cinnabar-solid-hover: #bb4c3e;
+  --bronze: #b08b57;
+  --bronze-soft: rgba(176, 139, 87, 0.14);
+
+  --on-accent: #fbf5ea;
+  --on-accent-soft: rgba(251, 245, 234, 0.28);
+  --on-accent-seal: rgba(251, 245, 234, 0.32);
+
+  --border-color: #3a342a;
+  --border-strong: #514737;
+  --border-subtle: rgba(120, 108, 88, 0.24);
+  --border-dashed: rgba(120, 108, 88, 0.32);
+  --mask: rgba(0, 0, 0, 0.62);
+  --selection-bg: rgba(222, 123, 103, 0.28);
+  --accent-border-soft: rgba(222, 123, 103, 0.28);
+
+  --success: #7eae8b;
+  --warning: #c39b62;
+  --danger: #e08473;
+  --danger-soft: rgba(224, 132, 115, 0.16);
+  --danger-border-soft: rgba(224, 132, 115, 0.36);
+  --success-soft: rgba(126, 174, 139, 0.12);
+  --success-border: rgba(126, 174, 139, 0.3);
+
+  --texture-opacity: 0.35;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.38);
+  --shadow-lg: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+
 /* ===== Reset & Base ===== */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html {
   font-size: 16px;
+  background-color: var(--bg-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -75,6 +148,7 @@ body::before {
   z-index: 0;
   pointer-events: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  opacity: var(--texture-opacity);
 }
 
 h1, h2, h3, h4,
@@ -89,7 +163,7 @@ button {
 }
 
 ::selection {
-  background: rgba(154, 46, 36, 0.16);
+  background: var(--selection-bg);
   color: var(--ink);
 }
 
@@ -214,9 +288,9 @@ button {
   gap: 0.45rem;
   width: auto;
   padding: 0.68rem 1.35rem;
-  background: var(--cinnabar);
-  color: #fbf8f1;
-  border: 1px solid var(--cinnabar);
+  background: var(--cinnabar-solid);
+  color: var(--on-accent);
+  border: 1px solid var(--cinnabar-solid);
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-weight: 600;
@@ -226,8 +300,8 @@ button {
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: var(--cinnabar-dark);
-  border-color: var(--cinnabar-dark);
+  background: var(--cinnabar-solid-hover);
+  border-color: var(--cinnabar-solid-hover);
 }
 
 .btn-primary:disabled {
@@ -257,7 +331,7 @@ button {
   padding: 0.5rem 1rem;
   background: var(--cinnabar-soft);
   color: var(--danger);
-  border: 1px solid rgba(154, 46, 36, 0.25);
+  border: 1px solid var(--danger-border-soft);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background 0.2s ease;
@@ -266,7 +340,7 @@ button {
 }
 
 .btn-danger:hover {
-  background: rgba(154, 46, 36, 0.14);
+  background: var(--danger-soft);
 }
 
 /* ===== Responsive ===== */

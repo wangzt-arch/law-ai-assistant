@@ -186,14 +186,14 @@ const corpusArticleCount = corpusMeta.laws.reduce((sum, law) => sum + law.articl
 
 .status-text.success {
   color: var(--success);
-  background: rgba(63, 106, 78, 0.08);
-  border: 1px solid rgba(63, 106, 78, 0.24);
+  background: var(--success-soft);
+  border: 1px solid var(--success-border);
 }
 
 .status-text.error {
   color: var(--danger);
   background: var(--cinnabar-soft);
-  border: 1px solid rgba(154, 46, 36, 0.24);
+  border: 1px solid var(--danger-border-soft);
 }
 
 .info-box {

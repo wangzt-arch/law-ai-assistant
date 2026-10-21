@@ -8,24 +8,46 @@
           <span class="subtitle">LEGAL AI COUNSEL</span>
         </div>
       </div>
-      <nav class="header-nav" aria-label="主导航">
+      <div class="header-right">
+        <nav class="header-nav" aria-label="主导航">
+          <button
+            v-for="tab in tabs"
+            :key="tab.key"
+            :class="['nav-btn', { active: currentTab === tab.key }]"
+            @click="$emit('switch-tab', tab.key)"
+          >
+            <svg class="nav-icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg"></svg>
+            <span>{{ tab.label }}</span>
+          </button>
+        </nav>
+        <span class="header-divider" aria-hidden="true"></span>
         <button
-          v-for="tab in tabs"
-          :key="tab.key"
-          :class="['nav-btn', { active: currentTab === tab.key }]"
-          @click="$emit('switch-tab', tab.key)"
+          class="theme-toggle"
+          type="button"
+          :title="theme === 'night' ? '切换到纸卷主题' : '切换到夜读主题'"
+          :aria-label="theme === 'night' ? '切换到纸卷主题' : '切换到夜读主题'"
+          @click="toggleTheme"
         >
-          <svg class="nav-icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg"></svg>
-          <span>{{ tab.label }}</span>
+          <svg v-if="theme === 'night'" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/>
+          </svg>
+          <svg v-else width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+          <span>{{ theme === 'night' ? '纸卷' : '夜读' }}</span>
         </button>
-      </nav>
+      </div>
     </div>
   </header>
 </template>
 
 <script setup>
+import { useTheme } from '../../composables/useTheme.js'
+
 defineProps(['currentTab'])
 defineEmits(['switch-tab'])
+
+const { theme, toggleTheme } = useTheme()
 
 const tabs = [
   {
@@ -46,7 +68,7 @@ const tabs = [
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(244, 240, 230, 0.92);
+  background: var(--bg-header);
   backdrop-filter: blur(10px) saturate(1.05);
   -webkit-backdrop-filter: blur(10px) saturate(1.05);
   border-bottom: 3px double var(--border-strong);
@@ -71,8 +93,8 @@ const tabs = [
 .logo-icon {
   width: 38px;
   height: 38px;
-  background: var(--cinnabar);
-  color: #fbf8f1;
+  background: var(--cinnabar-solid);
+  color: var(--on-accent);
   border-radius: 2px;
   display: flex;
   align-items: center;
@@ -81,12 +103,12 @@ const tabs = [
   font-size: 1.25rem;
   font-weight: 700;
   line-height: 1;
-  box-shadow: inset 0 0 0 2px rgba(251, 248, 241, 0.5);
+  box-shadow: inset 0 0 0 2px var(--on-accent-seal);
   transition: background 0.2s ease;
 }
 
 .logo-icon:hover {
-  background: var(--cinnabar-dark);
+  background: var(--cinnabar-solid-hover);
 }
 
 .logo-text {
@@ -114,6 +136,40 @@ const tabs = [
   color: var(--bronze);
   letter-spacing: 0.24em;
   text-transform: uppercase;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+}
+
+.header-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border-color);
+}
+
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.5rem;
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--ink-muted);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+}
+
+.theme-toggle:hover {
+  color: var(--cinnabar);
+  border-color: var(--cinnabar);
+  background: var(--cinnabar-soft);
 }
 
 .header-nav {
@@ -168,13 +224,18 @@ const tabs = [
   .logo-icon { width: 32px; height: 32px; font-size: 1.05rem; }
   .logo-text h1 { font-size: 1.08rem; }
   .logo-text .subtitle { display: none; }
+  .header-right { gap: 0.9rem; }
   .header-nav { gap: 1.2rem; }
   .nav-btn { font-size: 0.88rem; }
+  .theme-toggle { padding: 0.32rem; }
+  .theme-toggle span { display: none; }
 }
 
 @media (max-width: 480px) {
   .header-nav { gap: 0.9rem; }
   .nav-btn { font-size: 0.82rem; }
   .nav-icon-svg { display: none; }
+  .header-divider { display: none; }
+  .header-right { gap: 0.7rem; }
 }
 </style>

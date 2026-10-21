@@ -73,7 +73,7 @@ defineEmits(['dismiss'])
 }
 
 .error-card.success .error-icon {
-  background: rgba(63, 106, 78, 0.1);
+  background: var(--success-soft);
   color: var(--success);
 }
 
