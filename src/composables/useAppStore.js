@@ -5,6 +5,7 @@
  */
 import { ref, computed } from 'vue'
 import { setApiKey, setBaseUrl, DEFAULT_BASE_URL, testConnection, chat } from '../api/index.js'
+import { searchLegalArticles, verifyCitations } from '../utils/legalCorpus.js'
 
 // ==================== 导航状态 ====================
 
@@ -226,11 +227,13 @@ async function sendMessage(text, attachment = null) {
 
   try {
     const role = getChatRole(session.roleId)
+    const legalContext = role.id === 'legal' ? await buildLegalContext(text) : ''
     const messages = [
       {
         role: 'system',
         content: role.systemPrompt
       },
+      ...(legalContext ? [{ role: 'system', content: legalContext }] : []),
       ...session.messages.map(m => ({
         role: m.role,
         content: m.attachmentText
@@ -250,6 +253,15 @@ async function sendMessage(text, attachment = null) {
         })
       }
     })
+
+    if (role.id === 'legal') {
+      try {
+        const checks = await verifyCitations(session.messages[msgIndex].content)
+        if (checks.length) session.messages[msgIndex].citationChecks = checks
+      } catch (err) {
+        console.warn('法条核验失败:', err.message)
+      }
+    }
   } catch (err) {
     console.error(err)
     errorMsg.value = err.message
@@ -356,4 +368,23 @@ function updateChatSessionTitle(sessionId, title) {
 
 function getChatRole(roleId = 'general') {
   return chatRoles.find(role => role.id === roleId) || chatRoles[0]
+}
+
+/**
+ * 在本地法条库中检索相关条文，构造发给模型的法律上下文
+ * @param {string} query - 用户问题
+ * @returns {Promise<string>} 法条上下文
+ */
+async function buildLegalContext(query) {
+  const results = await searchLegalArticles(query, 6)
+  if (results.length === 0) {
+    return '本地法条库未检索到与当前问题直接相关的条文。回答涉及法条时，只有确认准确时才引用，并给出《法律名称》第X条；无法确认时明确标注“待核实”，不得编造法条、案号或来源。'
+  }
+
+  const references = results.map((result, index) => {
+    const { law, article } = result
+    return `【${index + 1}】《${law.title}》${article.no}${article.suffix || ''}${article.chapter ? `（${article.chapter}）` : ''}\n${article.text.slice(0, 700)}`
+  }).join('\n\n')
+
+  return `以下是本地法条库（整理自国家法律法规数据库）检索到的相关条文。请优先依据这些原文回答；引用时必须使用《法律全称》第X条 的格式；若所需条文不在此列表中且无法确认，请明确标注“待核实”，不得编造法条、案号或来源。\n\n${references}`
 }

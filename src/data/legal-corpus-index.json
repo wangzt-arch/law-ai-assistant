@@ -1,0 +1,447 @@
+{
+  "generatedAt": "2026-10-21",
+  "source": "https://flk.npc.gov.cn/",
+  "sourceMirror": "https://github.com/LawRefBook/Laws",
+  "laws": [
+    {
+      "id": "constitution",
+      "title": "中华人民共和国宪法",
+      "shortName": "宪法",
+      "category": "宪法",
+      "date": "2018-03-11",
+      "articleCount": 143
+    },
+    {
+      "id": "civil-code",
+      "title": "中华人民共和国民法典",
+      "shortName": "民法典",
+      "category": "法律",
+      "date": "2020-05-28",
+      "articleCount": 1260
+    },
+    {
+      "id": "criminal-law",
+      "title": "中华人民共和国刑法",
+      "shortName": "刑法",
+      "category": "法律",
+      "date": "2023-12-29",
+      "articleCount": 505
+    },
+    {
+      "id": "civil-procedure-law",
+      "title": "中华人民共和国民事诉讼法",
+      "shortName": "民事诉讼法",
+      "category": "诉讼与非诉讼程序法",
+      "date": "2023-09-01",
+      "articleCount": 306
+    },
+    {
+      "id": "criminal-procedure-law",
+      "title": "中华人民共和国刑事诉讼法",
+      "shortName": "刑事诉讼法",
+      "category": "诉讼与非诉讼程序法",
+      "date": "2018-10-26",
+      "articleCount": 307
+    },
+    {
+      "id": "administrative-procedure-law",
+      "title": "中华人民共和国行政诉讼法",
+      "shortName": "行政诉讼法",
+      "category": "诉讼与非诉讼程序法",
+      "date": "2017-06-27",
+      "articleCount": 103
+    },
+    {
+      "id": "administrative-penalty-law",
+      "title": "中华人民共和国行政处罚法",
+      "shortName": "行政处罚法",
+      "category": "行政法",
+      "date": "2021-01-22",
+      "articleCount": 86
+    },
+    {
+      "id": "administrative-license-law",
+      "title": "中华人民共和国行政许可法",
+      "shortName": "行政许可法",
+      "category": "行政法",
+      "date": "2019-04-23",
+      "articleCount": 83
+    },
+    {
+      "id": "administrative-coercion-law",
+      "title": "中华人民共和国行政强制法",
+      "shortName": "行政强制法",
+      "category": "行政法",
+      "date": "2011-06-30",
+      "articleCount": 71
+    },
+    {
+      "id": "administrative-reconsideration-law",
+      "title": "中华人民共和国行政复议法",
+      "shortName": "行政复议法",
+      "category": "行政法",
+      "date": "2023-09-01",
+      "articleCount": 90
+    },
+    {
+      "id": "public-security-penalty-law",
+      "title": "中华人民共和国治安管理处罚法",
+      "shortName": "治安管理处罚法",
+      "category": "行政法",
+      "date": "2025-06-27",
+      "articleCount": 144
+    },
+    {
+      "id": "road-traffic-safety-law",
+      "title": "中华人民共和国道路交通安全法",
+      "shortName": "道路交通安全法",
+      "category": "行政法",
+      "date": "2021-04-29",
+      "articleCount": 124
+    },
+    {
+      "id": "labor-law",
+      "title": "中华人民共和国劳动法",
+      "shortName": "劳动法",
+      "category": "社会法",
+      "date": "2018-12-29",
+      "articleCount": 107
+    },
+    {
+      "id": "labor-contract-law",
+      "title": "中华人民共和国劳动合同法",
+      "shortName": "劳动合同法",
+      "category": "社会法",
+      "date": "2012-12-28",
+      "articleCount": 98
+    },
+    {
+      "id": "social-insurance-law",
+      "title": "中华人民共和国社会保险法",
+      "shortName": "社会保险法",
+      "category": "社会法",
+      "date": "2018-12-29",
+      "articleCount": 98
+    },
+    {
+      "id": "labor-dispute-mediation-law",
+      "title": "中华人民共和国劳动争议调解仲裁法",
+      "shortName": "劳动争议调解仲裁法",
+      "category": "诉讼与非诉讼程序法",
+      "date": "2007-12-29",
+      "articleCount": 54
+    },
+    {
+      "id": "people-mediation-law",
+      "title": "中华人民共和国人民调解法",
+      "shortName": "人民调解法",
+      "category": "诉讼与非诉讼程序法",
+      "date": "2010-08-28",
+      "articleCount": 35
+    },
+    {
+      "id": "arbitration-law",
+      "title": "中华人民共和国仲裁法",
+      "shortName": "仲裁法",
+      "category": "诉讼与非诉讼程序法",
+      "date": "2025-09-12",
+      "articleCount": 96
+    },
+    {
+      "id": "company-law",
+      "title": "中华人民共和国公司法",
+      "shortName": "公司法",
+      "category": "民法商法",
+      "date": "2023-12-29",
+      "articleCount": 266
+    },
+    {
+      "id": "partnership-enterprise-law",
+      "title": "中华人民共和国合伙企业法",
+      "shortName": "合伙企业法",
+      "category": "民法商法",
+      "date": "2006-08-27",
+      "articleCount": 109
+    },
+    {
+      "id": "enterprise-bankruptcy-law",
+      "title": "中华人民共和国企业破产法",
+      "shortName": "企业破产法",
+      "category": "民法商法",
+      "date": "2006-08-27",
+      "articleCount": 136
+    },
+    {
+      "id": "insurance-law",
+      "title": "中华人民共和国保险法",
+      "shortName": "保险法",
+      "category": "民法商法",
+      "date": "2015-04-24",
+      "articleCount": 185
+    },
+    {
+      "id": "consumer-protection-law",
+      "title": "中华人民共和国消费者权益保护法",
+      "shortName": "消费者权益保护法",
+      "category": "民法商法",
+      "date": "2013-10-25",
+      "articleCount": 63
+    },
+    {
+      "id": "ecommerce-law",
+      "title": "中华人民共和国电子商务法",
+      "shortName": "电子商务法",
+      "category": "民法商法",
+      "date": "2018-08-31",
+      "articleCount": 89
+    },
+    {
+      "id": "anti-unfair-competition-law",
+      "title": "中华人民共和国反不正当竞争法",
+      "shortName": "反不正当竞争法",
+      "category": "经济法",
+      "date": "2025-06-27",
+      "articleCount": 41
+    },
+    {
+      "id": "anti-monopoly-law",
+      "title": "中华人民共和国反垄断法",
+      "shortName": "反垄断法",
+      "category": "经济法",
+      "date": "2022-06-24",
+      "articleCount": 70
+    },
+    {
+      "id": "product-quality-law",
+      "title": "中华人民共和国产品质量法",
+      "shortName": "产品质量法",
+      "category": "经济法",
+      "date": "2018-12-29",
+      "articleCount": 74
+    },
+    {
+      "id": "tax-collection-law",
+      "title": "中华人民共和国税收征收管理法",
+      "shortName": "税收征收管理法",
+      "category": "经济法",
+      "date": "2015-04-24",
+      "articleCount": 94
+    },
+    {
+      "id": "individual-income-tax-law",
+      "title": "中华人民共和国个人所得税法",
+      "shortName": "个人所得税法",
+      "category": "经济法",
+      "date": "2018-08-31",
+      "articleCount": 22
+    },
+    {
+      "id": "patent-law",
+      "title": "中华人民共和国专利法",
+      "shortName": "专利法",
+      "category": "民法商法",
+      "date": "2020-10-17",
+      "articleCount": 82
+    },
+    {
+      "id": "trademark-law",
+      "title": "中华人民共和国商标法",
+      "shortName": "商标法",
+      "category": "民法商法",
+      "date": "2026-06-26",
+      "articleCount": 87
+    },
+    {
+      "id": "copyright-law",
+      "title": "中华人民共和国著作权法",
+      "shortName": "著作权法",
+      "category": "民法商法",
+      "date": "2020-11-11",
+      "articleCount": 67
+    },
+    {
+      "id": "personal-information-protection-law",
+      "title": "中华人民共和国个人信息保护法",
+      "shortName": "个人信息保护法",
+      "category": "行政法",
+      "date": "2021-08-20",
+      "articleCount": 74
+    },
+    {
+      "id": "data-security-law",
+      "title": "中华人民共和国数据安全法",
+      "shortName": "数据安全法",
+      "category": "行政法",
+      "date": "2021-06-10",
+      "articleCount": 55
+    },
+    {
+      "id": "cybersecurity-law",
+      "title": "中华人民共和国网络安全法",
+      "shortName": "网络安全法",
+      "category": "行政法",
+      "date": "2025-10-28",
+      "articleCount": 81
+    },
+    {
+      "id": "food-safety-law",
+      "title": "中华人民共和国食品安全法",
+      "shortName": "食品安全法",
+      "category": "行政法",
+      "date": "2025-09-12",
+      "articleCount": 154
+    },
+    {
+      "id": "minor-protection-law",
+      "title": "中华人民共和国未成年人保护法",
+      "shortName": "未成年人保护法",
+      "category": "社会法",
+      "date": "2024-04-26",
+      "articleCount": 132
+    },
+    {
+      "id": "women-protection-law",
+      "title": "中华人民共和国妇女权益保障法",
+      "shortName": "妇女权益保障法",
+      "category": "社会法",
+      "date": "2022-10-30",
+      "articleCount": 86
+    },
+    {
+      "id": "anti-domestic-violence-law",
+      "title": "中华人民共和国反家庭暴力法",
+      "shortName": "反家庭暴力法",
+      "category": "社会法",
+      "date": "2015-12-27",
+      "articleCount": 38
+    },
+    {
+      "id": "safety-production-law",
+      "title": "中华人民共和国安全生产法",
+      "shortName": "安全生产法",
+      "category": "社会法",
+      "date": "2021-06-10",
+      "articleCount": 119
+    },
+    {
+      "id": "legal-aid-law",
+      "title": "中华人民共和国法律援助法",
+      "shortName": "法律援助法",
+      "category": "行政法",
+      "date": "2021-08-20",
+      "articleCount": 71
+    },
+    {
+      "id": "lawyer-law",
+      "title": "中华人民共和国律师法",
+      "shortName": "律师法",
+      "category": "行政法",
+      "date": "2017-09-01",
+      "articleCount": 60
+    },
+    {
+      "id": "environmental-protection-law",
+      "title": "中华人民共和国环境保护法",
+      "shortName": "环境保护法",
+      "category": "行政法",
+      "date": "2014-04-24",
+      "articleCount": 70
+    },
+    {
+      "id": "civil-code-general-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》总则编若干问题的解释",
+      "shortName": "民法典总则编解释",
+      "category": "司法解释",
+      "date": "2022-02-24",
+      "articleCount": 39
+    },
+    {
+      "id": "civil-code-property-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》物权编的解释（一）",
+      "shortName": "民法典物权编解释（一）",
+      "category": "司法解释",
+      "date": "2020-12-29",
+      "articleCount": 21
+    },
+    {
+      "id": "civil-code-contract-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》合同编通则若干问题的解释",
+      "shortName": "民法典合同编通则解释",
+      "category": "司法解释",
+      "date": "2023-12-04",
+      "articleCount": 69
+    },
+    {
+      "id": "civil-code-marriage-interpretation-1",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》婚姻家庭编的解释（一）",
+      "shortName": "民法典婚姻家庭编解释（一）",
+      "category": "司法解释",
+      "date": "2020-12-29",
+      "articleCount": 91
+    },
+    {
+      "id": "civil-code-marriage-interpretation-2",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》婚姻家庭编的解释（二）",
+      "shortName": "民法典婚姻家庭编解释（二）",
+      "category": "司法解释",
+      "date": "2025-01-15",
+      "articleCount": 23
+    },
+    {
+      "id": "civil-code-inheritance-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》继承编的解释（一）",
+      "shortName": "民法典继承编解释（一）",
+      "category": "司法解释",
+      "date": "2020-12-29",
+      "articleCount": 45
+    },
+    {
+      "id": "civil-code-tort-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》侵权责任编的解释（一）",
+      "shortName": "民法典侵权责任编解释（一）",
+      "category": "司法解释",
+      "date": "2024-09-25",
+      "articleCount": 26
+    },
+    {
+      "id": "civil-code-security-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国民法典》有关担保制度的解释",
+      "shortName": "民法典担保制度解释",
+      "category": "司法解释",
+      "date": "2020-12-31",
+      "articleCount": 71
+    },
+    {
+      "id": "labor-dispute-interpretation-1",
+      "title": "最高人民法院关于审理劳动争议案件适用法律问题的解释（一）",
+      "shortName": "劳动争议解释（一）",
+      "category": "司法解释",
+      "date": "2020-12-29",
+      "articleCount": 54
+    },
+    {
+      "id": "labor-dispute-interpretation-2",
+      "title": "最高人民法院关于审理劳动争议案件适用法律问题的解释（二）",
+      "shortName": "劳动争议解释（二）",
+      "category": "司法解释",
+      "date": "2025-07-31",
+      "articleCount": 21
+    },
+    {
+      "id": "civil-procedure-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国民事诉讼法》的解释",
+      "shortName": "民事诉讼法解释",
+      "category": "司法解释",
+      "date": "2022-04-02",
+      "articleCount": 550
+    },
+    {
+      "id": "administrative-procedure-interpretation",
+      "title": "最高人民法院关于适用《中华人民共和国行政诉讼法》的解释",
+      "shortName": "行政诉讼法解释",
+      "category": "司法解释",
+      "date": "2018-02-06",
+      "articleCount": 163
+    }
+  ]
+}

@@ -82,6 +82,21 @@
                 </svg>
                 {{ msg.attachmentName }}
               </div>
+              <div v-if="msg.citationChecks?.length" class="citation-check">
+                <div class="citation-head">
+                  <span class="citation-heading">本地法条核验</span>
+                  <span class="citation-summary">{{ verifiedCount(msg.citationChecks) }} / {{ msg.citationChecks.length }} 条匹配</span>
+                </div>
+                <div v-for="(check, ci) in msg.citationChecks" :key="ci" class="citation-item" :class="check.status">
+                  <span class="citation-status">{{ citationLabel(check.status) }}</span>
+                  <div class="citation-detail">
+                    <div class="citation-ref" :title="check.lawTitle">《{{ check.law }}》{{ check.articleLabel }}</div>
+                    <p v-if="check.snippet" class="citation-snippet">{{ check.snippet }}</p>
+                    <p v-else class="citation-snippet">{{ check.status === 'law-missing' ? '本地法条库未收录该法律，请以国家法律法规数据库的官方文本为准。' : '本地法条库未收录该条文，请以国家法律法规数据库的官方文本为准。' }}</p>
+                  </div>
+                </div>
+                <p class="citation-foot">核验依据：本地法条库（整理自国家法律法规数据库）</p>
+              </div>
               <div v-if="msg.role === 'assistant' && store.chatLoading.value && idx === store.chatMessages.value.length - 1 && !(msg.displayContent || msg.content)" class="typing-indicator">
                 <span class="typing-dot"></span>
                 <span class="typing-dot"></span>
@@ -201,6 +216,20 @@ async function handleFileChange(e) {
 
 function clearPendingFile() {
   pendingFile.value = null
+}
+
+const CITATION_LABELS = {
+  verified: '已核实',
+  'not-found': '本地未找到',
+  'law-missing': '法律未收录'
+}
+
+function citationLabel(status) {
+  return CITATION_LABELS[status] || '待核实'
+}
+
+function verifiedCount(checks) {
+  return checks.filter(check => check.status === 'verified').length
 }
 
 // 配置 marked
@@ -666,6 +695,106 @@ onMounted(() => {
   color: var(--cinnabar-dark);
   font-size: 0.7rem;
   word-break: break-all;
+}
+
+/* ===== 法条核验 ===== */
+.citation-check {
+  margin-top: 0.9rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 2px solid var(--bronze);
+}
+
+.citation-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.citation-heading {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--bronze);
+}
+
+.citation-summary {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.citation-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.55rem 0;
+  border-bottom: 1px dashed rgba(185, 174, 153, 0.42);
+}
+
+.citation-item:last-of-type {
+  border-bottom: none;
+}
+
+.citation-status {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.3rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.citation-item.verified .citation-status {
+  color: var(--success);
+}
+
+.citation-item.not-found .citation-status {
+  color: var(--bronze);
+}
+
+.citation-item.law-missing .citation-status {
+  color: var(--cinnabar);
+}
+
+.citation-detail {
+  min-width: 0;
+}
+
+.citation-ref {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.citation-snippet {
+  margin-top: 0.2rem;
+  font-size: 0.73rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.citation-foot {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
 }
 
 /* Markdown 渲染样式 */

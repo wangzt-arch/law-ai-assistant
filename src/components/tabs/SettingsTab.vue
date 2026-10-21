@@ -69,9 +69,12 @@
           <h4>说明</h4>
         </div>
         <ul>
-          <li>所有数据仅保存在浏览器本地，不会上传到任何服务器</li>
+          <li>API Key 与对话记录保存在浏览器本地，不会同步到本项目服务器</li>
+          <li>对话内容与上传文档会发送至你配置的 API 服务，请先脱敏</li>
           <li>对话内容会实时保存在浏览器中，切换会话不会丢失</li>
           <li>网络错误或限流时，客户端会自动进行指数退避重试</li>
+          <li>本地法条库：{{ corpusLawCount }} 部法律/司法解释，共 {{ corpusArticleCount }} 条（更新于 {{ corpusMeta.generatedAt }}）</li>
+          <li>法律顾问的引用会做本地核验；未匹配的条文会标记为“待核实”</li>
         </ul>
       </div>
     </div>
@@ -81,8 +84,11 @@
 <script setup>
 import { useAppStore } from '../../composables/useAppStore.js'
 import { DEFAULT_BASE_URL } from '../../api/index.js'
+import corpusMeta from '../../data/legal-corpus-index.json'
 
 const store = useAppStore()
+const corpusLawCount = corpusMeta.laws.length
+const corpusArticleCount = corpusMeta.laws.reduce((sum, law) => sum + law.articleCount, 0)
 </script>
 
 <style scoped>
