@@ -259,6 +259,42 @@ const LAWS = [
     id: 'administrative-procedure-interpretation', title: '最高人民法院关于适用《中华人民共和国行政诉讼法》的解释', shortName: '行政诉讼法解释',
     category: '司法解释', date: '2018-02-06',
     files: ['司法解释/最高人民法院关于适用《行政诉讼法》的解释(2018-02-06).md']
+  },
+  {
+    id: 'personal-injury-interpretation', title: '最高人民法院关于审理人身损害赔偿案件适用法律若干问题的解释', shortName: '人身损害赔偿解释',
+    category: '司法解释', date: '2022-04-24',
+    aliases: ['人身损害赔偿解释', '人身损害解释'],
+    files: ['司法解释/最高人民法院关于审理人身损害赔偿案件适用法律若干问题的解释(2022-04-24).md']
+  },
+  {
+    id: 'traffic-accident-interpretation', title: '最高人民法院关于审理道路交通事故损害赔偿案件适用法律若干问题的解释', shortName: '道路交通事故损害赔偿解释',
+    category: '司法解释', date: '2020-12-29',
+    aliases: ['道路交通事故损害赔偿解释', '交通事故损害赔偿解释', '道交损害赔偿解释'],
+    files: ['司法解释/最高人民法院关于审理道路交通事故损害赔偿案件适用法律若干问题的解释(2020-12-29).md']
+  },
+  {
+    id: 'traffic-criminal-interpretation', title: '最高人民法院关于审理交通肇事刑事案件具体应用法律若干问题的解释', shortName: '交通肇事刑事案件解释',
+    category: '司法解释', date: '2000-11-15',
+    aliases: ['交通肇事刑事案件解释', '交通肇事解释'],
+    files: ['司法解释/最高人民法院关于审理交通肇事刑事案件具体应用法律若干问题的解释(2000-11-15).md']
+  },
+  {
+    id: 'compulsory-traffic-insurance-regulation', title: '机动车交通事故责任强制保险条例', shortName: '交强险条例',
+    category: '行政法规', date: '2019-03-02',
+    aliases: ['交强险条例', '机动车交通事故责任强制保险条例', '交强险'],
+    files: ['行政法规/机动车交通事故责任强制保险条例(2019-03-02).md']
+  },
+  {
+    id: 'work-injury-insurance-regulation', title: '工伤保险条例', shortName: '工伤保险条例',
+    category: '行政法规', date: '2010-12-20',
+    aliases: ['工伤保险条例', '工伤条例'],
+    files: ['行政法规/工伤保险条例(2010-12-20).md']
+  },
+  {
+    id: 'road-traffic-safety-regulation', title: '中华人民共和国道路交通安全法实施条例', shortName: '道路交通安全法实施条例',
+    category: '行政法规', date: '2017-10-07',
+    aliases: ['道路交通安全法实施条例', '道交法实施条例'],
+    files: ['行政法规/道路交通安全法实施条例(2017-10-07).md']
   }
 ]
 
@@ -408,7 +444,7 @@ async function buildLaw(meta) {
     category: meta.category,
     date: meta.date,
     source: rawUrl(meta.files[0]),
-    aliases: [meta.title, meta.shortName],
+    aliases: [meta.title, meta.shortName, ...(meta.aliases || [])],
     articles
   }
 }
@@ -449,7 +485,7 @@ async function main() {
   await fs.writeFile(path.join(OUT_DIR, 'legal-corpus-index.json'), JSON.stringify(index, null, 2), 'utf8')
 
   const articleCount = laws.reduce((sum, law) => sum + law.articles.length, 0)
-  console.log(`\n完成：${laws.length} 部法律/司法解释，共 ${articleCount} 条`)
+  console.log(`\n完成：${laws.length} 部法律文件，共 ${articleCount} 条`)
   console.log(`输出：${path.join(OUT_DIR, 'legal-corpus.json')}`)
 }
 
