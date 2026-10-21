@@ -1,14 +1,5 @@
 import corpusIndex from '../data/legal-corpus-index.json'
-
-const CN_DIGITS = { 零: 0, 〇: 0, 一: 1, 二: 2, 两: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9 }
-const CN_UNITS = { 十: 10, 百: 100, 千: 1000 }
-
-let segmenter = null
-try {
-  segmenter = new Intl.Segmenter('zh-Hans', { granularity: 'word' })
-} catch {
-  segmenter = null
-}
+import { parseCnNumber, normalizeLawName, compactText, tokenize } from './chineseText.js'
 
 // 交通事故垂直领域的核心条文加权，避免“挂车、试乘”等特殊情形条文挤占通用规则。
 // 法条修订后条文序号若变化，需要同步核对这里的条目。
@@ -101,7 +92,7 @@ const state = {
 }
 
 // 口语化问题与法条用语的常见对应关系，用于扩展检索词
-const QUERY_EXPANSIONS = [
+export const QUERY_EXPANSIONS = [
   { test: /借钱|欠钱|欠款|还钱|讨债|不还|借款/, terms: '借款 贷款人 借款人 返还 偿还 债务' },
   { test: /离婚.*(财产|房产|房子)|(财产|房产).*分割|分财产/, terms: '夫妻 共同财产 协议 分割 照顾子女' },
   { test: /假货|假冒|伪劣|翻新|退一赔三|三倍赔偿|十倍赔偿|几倍赔偿|消费者/, terms: '消费者 经营者 欺诈 商品 增加赔偿 三倍' },
@@ -127,63 +118,6 @@ const QUERY_EXPANSIONS = [
 ]
 
 export const corpusMeta = corpusIndex
-
-function parseCnNumber(input) {
-  if (/^\d+$/.test(input)) return Number(input)
-  let section = 0
-  let number = 0
-  for (const ch of input) {
-    if (ch in CN_DIGITS) number = CN_DIGITS[ch]
-    else if (ch in CN_UNITS) {
-      if (number === 0) number = 1
-      section += number * CN_UNITS[ch]
-      number = 0
-    }
-  }
-  return section + number
-}
-
-function normalizeLawName(name) {
-  return (name || '')
-    .replace(/[《》〈〉「」『』()（）\s　·,，.。:：;；、<>]/g, '')
-    .replace(/中华人民共和国/g, '')
-    .replace(/最高人民法院|最高人民检察院/g, '')
-    .replace(/关于/g, '')
-    .replace(/适用/g, '')
-    .replace(/若干问题/g, '')
-    .replace(/的/g, '')
-    .toLowerCase()
-}
-
-function compactText(text) {
-  return (text || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, '')
-}
-
-function tokenize(text) {
-  const tokens = new Map()
-  const add = (token, weight) => {
-    const current = tokens.get(token)
-    if (current) current.tf += 1
-    else tokens.set(token, { tf: 1, weight })
-  }
-
-  const normalized = (text || '').toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ')
-  if (segmenter) {
-    for (const part of segmenter.segment(normalized)) {
-      if (part.isWordLike && part.segment.length >= 2) {
-        add(part.segment, part.segment.length >= 3 ? 2.4 : 1.8)
-      }
-    }
-  }
-  for (const run of normalized.match(/[\u4e00-\u9fff]{2,}/g) || []) {
-    for (let i = 0; i < run.length - 1; i++) {
-      const bigram = run.slice(i, i + 2)
-      if (!tokens.has(bigram)) add(bigram, 1)
-    }
-  }
-  for (const word of normalized.match(/[a-z0-9]{2,}/g) || []) add(word, 2)
-  return tokens
-}
 
 function buildIndex() {
   state.docs = []

@@ -1,4 +1,4 @@
-const { app, BrowserWindow, protocol, ipcMain, Menu, dialog, Tray } = require('electron')
+const { app, BrowserWindow, protocol, ipcMain, Menu, dialog, Tray, shell } = require('electron')
 const path = require('path')
 const url = require('url')
 
@@ -249,6 +249,13 @@ function createWindow() {
     },
     title: '法律AI助手-小卢',
     icon: path.join(__dirname, '../images/star.ico')
+  })
+
+  mainWindow.webContents.setWindowOpenHandler(({ url: targetUrl }) => {
+    if (targetUrl.startsWith('https://') || targetUrl.startsWith('http://')) {
+      shell.openExternal(targetUrl)
+    }
+    return { action: 'deny' }
   })
 
   if (process.env.NODE_ENV === 'development') {

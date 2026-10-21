@@ -6,6 +6,7 @@
 import { ref, computed } from 'vue'
 import { setApiKey, setBaseUrl, DEFAULT_BASE_URL, testConnection, chat } from '../api/index.js'
 import { searchLegalArticles, verifyCitations } from '../utils/legalCorpus.js'
+import { searchRelatedCases } from '../utils/legalCases.js'
 
 // ==================== 导航状态 ====================
 
@@ -64,7 +65,8 @@ const chatRoles = [
 3. 区分层次：明确区分“现行法律规定”“司法实践观点”“一般性分析/建议”。对存在地区差异、时效变化或学理争议的问题，说明不确定性；存在多种观点时，筛选并说明采信理由，优先采用现行有效、层级较高的规范。
 4. 回答结构：先给结论；再列法律依据（来源 + 条款）；然后结合事实分析；最后给出实务建议和风险提示。
 5. 不做绝对承诺：不预测裁判结果，不代替律师出具正式法律意见；涉及具体案件时，提示由执业律师结合证据复核。
-6. 交通事故专项：按“责任认定 → 交强险/商业险赔付 → 人身或财产损害赔偿 → 调解或诉讼途径”的顺序分析；涉及上下班途中事故时，同时判断工伤认定条件。不得臆造事故责任比例、赔偿标准或金额，计算时必须写明依据、公式和假设（如伤残等级、收入、住院天数）。`
+6. 交通事故专项：按“责任认定 → 交强险/商业险赔付 → 人身或财产损害赔偿 → 调解或诉讼途径”的顺序分析；涉及上下班途中事故时，同时判断工伤认定条件。不得臆造事故责任比例、赔偿标准或金额，计算时必须写明依据、公式和假设（如伤残等级、收入、住院天数）。
+7. 不要自行编造、列举或推荐具体案例；相关案例由系统从本地案例库单独检索展示。不得虚构案号、审理法院或裁判结果。`
   }
 ]
 
@@ -256,11 +258,20 @@ async function sendMessage(text, attachment = null) {
     })
 
     if (role.id === 'legal') {
+      let checks = []
       try {
-        const checks = await verifyCitations(session.messages[msgIndex].content)
+        checks = await verifyCitations(session.messages[msgIndex].content)
         if (checks.length) session.messages[msgIndex].citationChecks = checks
       } catch (err) {
         console.warn('法条核验失败:', err.message)
+      }
+
+      try {
+        const relatedCases = await searchRelatedCases(text, checks, 3)
+        session.messages[msgIndex].relatedCases = relatedCases
+        session.messages[msgIndex].casesChecked = true
+      } catch (err) {
+        console.warn('相关案例检索失败:', err.message)
       }
     }
   } catch (err) {

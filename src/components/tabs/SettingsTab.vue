@@ -74,7 +74,9 @@
           <li>对话内容会实时保存在浏览器中，切换会话不会丢失</li>
           <li>网络错误或限流时，客户端会自动进行指数退避重试</li>
           <li>本地法条库：{{ corpusLawCount }} 部法律文件，共 {{ corpusArticleCount }} 条（更新于 {{ corpusMeta.generatedAt }}）</li>
+          <li>本地案例库：{{ caseCorpusMeta.guidingCount }} 件指导性案例 + {{ caseCorpusMeta.gazetteCount }} 件公报案例（更新于 {{ caseCorpusMeta.generatedAt }}）</li>
           <li>法律顾问的引用会做本地核验；未匹配的条文会标记为“待核实”</li>
+          <li>回答后会从本地案例库检索最多 3 条相关案例，不由模型生成</li>
         </ul>
       </div>
     </div>
@@ -85,6 +87,7 @@
 import { useAppStore } from '../../composables/useAppStore.js'
 import { DEFAULT_BASE_URL } from '../../api/index.js'
 import corpusMeta from '../../data/legal-corpus-index.json'
+import caseCorpusMeta from '../../data/legal-cases-index.json'
 
 const store = useAppStore()
 const corpusLawCount = corpusMeta.laws.length

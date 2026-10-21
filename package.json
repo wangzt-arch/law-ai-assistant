@@ -10,6 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "corpus:update": "node scripts/build-law-corpus.mjs",
+    "cases:update": "node scripts/build-case-corpus.mjs",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
     "electron:build": "npm run build && node -e \"const fs=require('fs');['dist','release','build-output','法律AI助手-小卢-win32-x64'].forEach(d=>{if(fs.existsSync(d))fs.rmSync(d,{recursive:true,force:true,maxRetries:5,retryDelay:100});})\" && npx electron-packager . 法律AI助手-小卢 --platform=win32 --arch=x64 --out=dist --icon=src/images/star.ico --overwrite --asar"
   },

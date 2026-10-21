@@ -97,6 +97,32 @@
                 </div>
                 <p class="citation-foot">核验依据：本地法条库（整理自国家法律法规数据库）</p>
               </div>
+              <div v-if="msg.relatedCases?.length || msg.casesChecked" class="case-check">
+                <div class="case-head">
+                  <span class="case-heading">相关案例</span>
+                  <span class="case-summary">本地案例库 · 最多 3 条</span>
+                </div>
+                <a
+                  v-for="item in msg.relatedCases"
+                  :key="item.id"
+                  class="case-item"
+                  :href="item.sourceUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <div class="case-meta">
+                    <span class="case-tag">{{ caseLabel(item) }}</span>
+                    <span v-if="item.caseNumber" class="case-no">{{ item.caseNumber }}</span>
+                    <span v-if="item.type === 'gazette' && item.publishedAt" class="case-no">{{ item.publishedAt }}{{ item.issueNo ? `年第${item.issueNo}期` : '年' }}</span>
+                    <span v-if="item.court" class="case-court">{{ item.court }}</span>
+                  </div>
+                  <div class="case-title">{{ item.title }}</div>
+                  <p class="case-snippet">{{ item.snippet }}</p>
+                  <span class="case-source">最高人民法院官网 →</span>
+                </a>
+                <p v-if="!msg.relatedCases?.length" class="case-empty">本地案例库未检索到相近案例，未生成推测性案例。</p>
+                <p class="case-foot">案例来源：最高人民法院指导性案例 / 公报案例（本地检索，不由模型生成）</p>
+              </div>
               <div v-if="msg.role === 'assistant' && store.chatLoading.value && idx === store.chatMessages.value.length - 1 && !(msg.displayContent || msg.content)" class="typing-indicator">
                 <span class="typing-dot"></span>
                 <span class="typing-dot"></span>
@@ -226,6 +252,10 @@ const CITATION_LABELS = {
 
 function citationLabel(status) {
   return CITATION_LABELS[status] || '待核实'
+}
+
+function caseLabel(item) {
+  return item.type === 'guiding' ? `指导案例${item.number}号` : '公报案例'
 }
 
 function verifiedCount(checks) {
@@ -788,6 +818,136 @@ onMounted(() => {
 }
 
 .citation-foot {
+  margin-top: 0.55rem;
+  padding-top: 0.45rem;
+  border-top: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+}
+
+/* ===== 相关案例 ===== */
+.case-check {
+  margin-top: 0.7rem;
+  padding: 0.7rem 0.85rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-left: 2px solid var(--cinnabar);
+}
+
+.case-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.case-heading {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--cinnabar);
+}
+
+.case-summary {
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.case-item {
+  display: block;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed rgba(185, 174, 153, 0.42);
+  color: inherit;
+  text-decoration: none;
+}
+
+.case-item:last-of-type {
+  border-bottom: none;
+}
+
+.case-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.55rem;
+  margin-bottom: 0.28rem;
+}
+
+.case-tag {
+  font-family: var(--font-mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.03em;
+  padding: 0.08rem 0.3rem;
+  border: 1px solid currentColor;
+  border-radius: var(--radius-sm);
+  color: var(--cinnabar-dark);
+  white-space: nowrap;
+}
+
+.case-no,
+.case-court {
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  color: var(--text-muted);
+}
+
+.case-court {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+
+.case-title {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--ink);
+  transition: color 0.15s ease;
+}
+
+.case-snippet {
+  margin-top: 0.2rem;
+  font-size: 0.72rem;
+  line-height: 1.65;
+  color: var(--text-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.case-source {
+  display: inline-block;
+  margin-top: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.04em;
+  color: var(--bronze);
+  transition: color 0.15s ease;
+}
+
+.case-item:hover .case-title,
+.case-item:focus-visible .case-title,
+.case-item:hover .case-source,
+.case-item:focus-visible .case-source {
+  color: var(--cinnabar);
+}
+
+.case-empty {
+  padding: 0.65rem 0 0.2rem;
+  font-size: 0.73rem;
+  color: var(--text-muted);
+}
+
+.case-foot {
   margin-top: 0.55rem;
   padding-top: 0.45rem;
   border-top: 1px solid var(--border-color);
