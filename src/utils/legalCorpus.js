@@ -81,6 +81,8 @@ const EXTRA_ALIASES = {
   'personal-injury-interpretation': ['人身损害赔偿司法解释']
 }
 
+const SOURCE_BLOB = 'https://github.com/LawRefBook/Laws/blob/master/'
+
 const state = {
   laws: [],
   docs: [],
@@ -458,6 +460,15 @@ export async function getArticleDetail(check) {
   const article = law.articles.find(item => item.n === n && (item.suffix || '') === suffix)
   if (!article) return null
 
+  let sourceUrl = law.source
+  if (article.file) {
+    sourceUrl = SOURCE_BLOB + article.file.split('/').map(encodeURIComponent).join('/')
+    if (article.line) {
+      const endLine = article.endLine && article.endLine !== article.line ? `-L${article.endLine}` : ''
+      sourceUrl += `#L${article.line}${endLine}`
+    }
+  }
+
   return {
     law: {
       id: law.id,
@@ -472,7 +483,8 @@ export async function getArticleDetail(check) {
       no: article.no,
       suffix: article.suffix || '',
       chapter: article.chapter || '',
-      text: article.text
+      text: article.text,
+      sourceUrl
     }
   }
 }

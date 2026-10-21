@@ -373,13 +373,16 @@ function parseArticles(markdown) {
         no: `第${current.numberCn}条`,
         suffix: current.suffix,
         chapter,
-        text
+        text,
+        line: current.startLine,
+        endLine: current.endLine
       })
     }
     current = null
   }
 
-  for (const rawLine of lines) {
+  for (let i = 0; i < lines.length; i++) {
+    const rawLine = lines[i]
     const line = rawLine.trim()
     if (!line) {
       if (current) current.lines.push('')
@@ -400,12 +403,17 @@ function parseArticles(markdown) {
       current = {
         numberCn: match[1],
         suffix: match[2] || '',
-        lines: match[3] ? [match[3]] : []
+        lines: match[3] ? [match[3]] : [],
+        startLine: i + 1,
+        endLine: i + 1
       }
       continue
     }
 
-    if (current) current.lines.push(line)
+    if (current) {
+      current.lines.push(line)
+      current.endLine = i + 1
+    }
   }
 
   flush()
@@ -421,17 +429,16 @@ function decodeEntities(text) {
 }
 
 async function buildLaw(meta) {
-  const parts = []
+  const parsed = []
   for (const file of meta.files) {
-    const content = await fetchText(rawUrl(file))
-    parts.push(content)
+    const content = decodeEntities(await fetchText(rawUrl(file)))
+    for (const article of parseArticles(content)) {
+      parsed.push({ ...article, file })
+    }
   }
 
-  const markdown = decodeEntities(parts.join('\n\n'))
-  let articles = parseArticles(markdown)
-
   const seen = new Set()
-  articles = articles
+  let articles = parsed
     .filter(article => {
       const key = `${article.n}${article.suffix}`
       if (seen.has(key)) return false

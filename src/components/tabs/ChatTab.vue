@@ -243,7 +243,7 @@
         </div>
         <div class="article-footer">
           <span>内容来自本地法条库（整理自国家法律法规数据库）</span>
-          <a v-if="articleDetail?.law.source" :href="articleDetail.law.source" target="_blank" rel="noopener noreferrer">查看来源 →</a>
+          <a v-if="articleDetail?.article.sourceUrl" :href="articleDetail.article.sourceUrl" target="_blank" rel="noopener noreferrer">定位到来源原文 →</a>
         </div>
       </section>
     </div>
