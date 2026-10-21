@@ -27,59 +27,42 @@ const connStatus = ref('')
 
 // ==================== 对话状态 ====================
 
-const CHAT_RESPONSE_PROTOCOL = `当用户需要图像或视频生成提示词时，必须使用以下 Markdown 结构：
-
-## 生图提示词
-\`\`\`prompt
-只放可直接发送给图像模型的完整正向提示词。
-\`\`\`
-## 生图反向提示词
-\`\`\`negative-prompt
-只放需要排除的内容；没有时保持空代码块。
-\`\`\`
-
-## 生视频提示词
-\`\`\`prompt
-只放可直接发送给视频模型的完整正向提示词。
-\`\`\`
-## 生视频反向提示词
-\`\`\`negative-prompt
-只放需要排除的内容；没有时保持空代码块。
-\`\`\`
-
-普通回答无需使用提示词区块。严禁在其他位置输出可提取提示词，也不要省略标题或代码块。`
-
 /** 新建对话时可选择的固定角色 */
 const chatRoles = [
   {
-    id: 'default',
-    name: '普通对话',
-    description: '自然问答与通用协作',
-    systemPrompt: '你是一个可靠、自然的通用 AI 助手。直接回答用户问题；只有用户明确需要创作提示词时才提供提示词区块。'
+    id: 'general',
+    name: '基础问答',
+    description: '通用问题解答与信息整理',
+    temperature: 0.6,
+    systemPrompt: `你是一个严谨、克制的通用 AI 助手。回答先给结论，再给必要的依据、步骤或示例；表达清晰、简洁。
+- 只陈述你能够确认的信息；不确定时明确说明“不确定”或“无法确认”，并指出还需要哪些信息。
+- 不得编造事实、数据、引文或来源；无法提供来源时直接说明。
+- 涉及需要实时核验的信息（政策、价格、时效等）时，提醒用户以权威渠道为准。`
   },
   {
-    id: 'prompt-assistant',
-    name: '提示词助手',
-    description: '将想法转成可生成提示词',
-    systemPrompt: '你是专业提示词助手。先澄清创作目标，再给出适合目标媒介的高质量正向与反向提示词，覆盖主体、风格、构图、光线和质感。'
+    id: 'document',
+    name: '文档阅读',
+    description: '阅读上传的文档并总结主要内容',
+    temperature: 0.2,
+    systemPrompt: `你是一个严谨的文档阅读助手。用户会提供一份文档的内容（可能来自 PDF、Word 或纯文本）。
+请按以下结构回答：
+1. 文档概览：类型、主题、结构/篇幅。
+2. 核心结论：用 3-5 条概括文档的主旨。
+3. 关键要点：按章节或主题列出，保留重要主体、金额、时间、权利义务等细节。
+4. 风险与待确认事项：指出缺失、矛盾或需要进一步核实的内容。
+严格只依据文档内容作答，不得补充文档中没有的事实。若文档内容不完整（如被截断、扫描件无法识别），必须明确说明。`
   },
   {
-    id: 'visual-director',
-    name: '视觉导演',
-    description: '定义构图、风格与镜头语言',
-    systemPrompt: '你是视觉导演。围绕品牌、受众和情绪提出构图、色彩、光线、镜头和参考方向，并在结尾给出可直接生成的提示词。'
-  },
-  {
-    id: 'storyboard',
-    name: '视频分镜师',
-    description: '拆解镜头、动作与节奏',
-    systemPrompt: '你是视频分镜师。把创意拆成清晰的镜头运动、主体动作、节奏和时长建议，并优先给出可直接用于视频生成的提示词。'
-  },
-  {
-    id: 'brand-copywriter',
-    name: '品牌文案师',
-    description: '提炼品牌表达与内容方向',
-    systemPrompt: '你是品牌文案师。根据品牌、受众和渠道提炼简报、传播主张和文案方向；需要视觉素材时，再给出匹配的生成提示词。'
+    id: 'legal',
+    name: '法律顾问',
+    description: '基于可核查来源的法律分析',
+    temperature: 0.2,
+    systemPrompt: `你是一名严谨的中国法律分析助手。回答必须遵守以下规则：
+1. 来源可核查：涉及法律条文、司法解释、案例或裁判规则时，必须给出可核查的来源（法律法规或司法解释全称 + 条款号；案例需给出案号或官方发布名称）。不得编造法条、案号、发布机关、链接或案例。
+2. 无法核实时：如果你不能确认某项依据的现行有效性或具体内容，必须标注“待核实”，并说明应在国家法律法规数据库、最高人民法院官网等权威渠道核对；不得用猜测填补。
+3. 区分层次：明确区分“现行法律规定”“司法实践观点”“一般性分析/建议”。对存在地区差异、时效变化或学理争议的问题，说明不确定性；存在多种观点时，筛选并说明采信理由，优先采用现行有效、层级较高的规范。
+4. 回答结构：先给结论；再列法律依据（来源 + 条款）；然后结合事实分析；最后给出实务建议和风险提示。
+5. 不做绝对承诺：不预测裁判结果，不代替律师出具正式法律意见；涉及具体案件时，提示由执业律师结合证据复核。`
   }
 ]
 
@@ -119,7 +102,7 @@ function loadSettings() {
   const savedSessions = JSON.parse(localStorage.getItem('agnes_chat_sessions') || '[]')
   chatSessions.value = savedSessions.map(session => ({
     ...session,
-    roleId: chatRoles.some(role => role.id === session.roleId) ? session.roleId : 'default',
+    roleId: chatRoles.some(role => role.id === session.roleId) ? session.roleId : 'general',
     messages: session.messages.map(msg => ({
       ...msg,
       displayContent: msg.displayContent || msg.content
@@ -199,8 +182,9 @@ export function useAppStore() {
 /**
  * 发送对话消息
  * @param {string} text - 用户输入的消息内容
+ * @param {object} [attachment] - 附件内容：{ name, text }
  */
-async function sendMessage(text) {
+async function sendMessage(text, attachment = null) {
   if (!apiKey.value) { errorMsg.value = '请先在设置中配置 API Key'; return }
   if (!text.trim()) return
 
@@ -214,6 +198,10 @@ async function sendMessage(text) {
     role: 'user',
     content: text,
     createdAt: new Date().toISOString()
+  }
+  if (attachment) {
+    userMsg.attachmentName = attachment.name
+    userMsg.attachmentText = attachment.text
   }
   session.messages.push(userMsg)
 
@@ -241,15 +229,17 @@ async function sendMessage(text) {
     const messages = [
       {
         role: 'system',
-        content: `${role.systemPrompt}\n\n${CHAT_RESPONSE_PROTOCOL}`
+        content: role.systemPrompt
       },
       ...session.messages.map(m => ({
         role: m.role,
-        content: m.content
+        content: m.attachmentText
+          ? `${m.content}\n\n【文档《${m.attachmentName}》内容开始】\n${m.attachmentText}\n【文档内容结束】`
+          : m.content
       }))
     ]
 
-    await chat({ messages }, (chunk, fullContent) => {
+    await chat({ messages, temperature: role.temperature }, (chunk, fullContent) => {
       // SSE 流式期间：用 rAF 节流，避免每个 chunk 都触发响应式更新
       const reactiveMsg = session.messages[msgIndex]
       reactiveMsg.content = fullContent
@@ -303,11 +293,11 @@ function saveChatSessions() {
  * 创建新对话会话
  * @returns {object} 新创建的会话对象
  */
-function createChatSession(roleId = 'default') {
+function createChatSession(roleId = 'general') {
   const role = getChatRole(roleId)
   const newSession = {
     id: Date.now(),
-    title: role.id === 'default' ? '新对话' : `${role.name}对话`,
+    title: role.id === 'general' ? '新对话' : `${role.name}对话`,
     roleId: role.id,
     messages: [],
     createdAt: new Date().toISOString(),
@@ -364,6 +354,6 @@ function updateChatSessionTitle(sessionId, title) {
   }
 }
 
-function getChatRole(roleId = 'default') {
+function getChatRole(roleId = 'general') {
   return chatRoles.find(role => role.id === roleId) || chatRoles[0]
 }

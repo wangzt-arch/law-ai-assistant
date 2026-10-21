@@ -81,6 +81,12 @@
                 <span v-if="msg.role === 'assistant'" class="model-label">agnes-2.5-flash</span>
               </div>
               <div class="message-body" v-html="renderMessage(msg, idx)"></div>
+              <div v-if="msg.attachmentName" class="message-attachment">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                </svg>
+                {{ msg.attachmentName }}
+              </div>
               <div v-if="msg.role === 'assistant' && store.chatLoading.value && idx === store.chatMessages.value.length - 1 && !(msg.displayContent || msg.content)" class="typing-indicator">
                 <span class="typing-dot"></span>
                 <span class="typing-dot"></span>
@@ -92,6 +98,14 @@
 
         <div class="chat-input-area">
           <div class="input-wrapper">
+            <div v-if="pendingFile" class="attachment-chip">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+              </svg>
+              <span class="attachment-name">{{ pendingFile.name }}</span>
+              <span class="attachment-meta">{{ pendingFile.truncated ? '内容过长，已截取前 6 万字' : `${pendingFile.text.length} 字` }}</span>
+              <button class="attachment-remove" title="移除附件" @click="clearPendingFile">×</button>
+            </div>
             <textarea
               v-model="inputMessage"
               placeholder="输入你的问题,回车发送..."
@@ -106,7 +120,19 @@
             </button>
           </div>
           <div class="input-actions">
-            <button class="btn-primary send-btn" @click="sendMessage" :disabled="!inputMessage.trim() || store.chatLoading.value">
+            <div class="input-tools">
+              <input ref="fileInput" type="file" accept=".txt,.md,.markdown,.csv,.json,.log,.pdf,.docx" hidden @change="handleFileChange">
+              <button class="attach-btn" :disabled="store.chatLoading.value || readingFile" :title="readingFile ? '正在解析文档' : '上传文档'" @click="fileInput.click()">
+                <svg v-if="!readingFile" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                </svg>
+                <svg v-else class="spin-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                </svg>
+              </button>
+              <span class="attach-hint">{{ readingFile ? '正在解析文档...' : '支持 PDF / DOCX / TXT，最大 20MB' }}</span>
+            </div>
+            <button class="btn-primary send-btn" @click="sendMessage" :disabled="(!inputMessage.trim() && !pendingFile) || store.chatLoading.value || readingFile">
               <svg v-if="!store.chatLoading.value" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="m22 2-7 20-4-9-9-4Z"/>
               </svg>
@@ -146,15 +172,39 @@
 import { ref, watch, nextTick, onMounted } from 'vue'
 import { marked } from 'marked'
 import { useAppStore } from '../../composables/useAppStore.js'
+import { readDocument } from '../../utils/readDocument.js'
 
 const store = useAppStore()
 const inputMessage = ref('')
 const messagesContainer = ref(null)
 const rolePickerOpen = ref(false)
+const fileInput = ref(null)
+const pendingFile = ref(null)
+const readingFile = ref(false)
 
 function createRoleSession(roleId) {
   store.createChatSession(roleId)
   rolePickerOpen.value = false
+}
+
+async function handleFileChange(e) {
+  const file = e.target.files?.[0]
+  e.target.value = ''
+  if (!file) return
+
+  readingFile.value = true
+  try {
+    pendingFile.value = { name: file.name, ...(await readDocument(file)) }
+  } catch (err) {
+    pendingFile.value = null
+    store.errorMsg.value = err.message || '文件解析失败'
+  } finally {
+    readingFile.value = false
+  }
+}
+
+function clearPendingFile() {
+  pendingFile.value = null
 }
 
 // 配置 marked
@@ -210,11 +260,15 @@ function renderMessage(msg, idx) {
 }
 
 async function sendMessage() {
-  const text = inputMessage.value.trim()
-  if (!text || store.chatLoading.value) return
+  if (store.chatLoading.value || readingFile.value) return
 
-  await store.sendMessage(text)
+  const attachment = pendingFile.value
+  const text = inputMessage.value.trim() || (attachment ? `请阅读《${attachment.name}》并总结主要内容。` : '')
+  if (!text) return
+
+  await store.sendMessage(text, attachment)
   inputMessage.value = ''
+  pendingFile.value = null
   scrollToBottom()
 }
 
@@ -601,6 +655,19 @@ onMounted(() => {
   color: #fff;
 }
 
+.message-attachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.16);
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.72rem;
+  word-break: break-all;
+}
+
 /* Markdown 渲染样式 */
 .message-body :deep(p) {
   margin: 0.5rem 0;
@@ -774,6 +841,49 @@ onMounted(() => {
   margin-bottom: 0.75rem;
 }
 
+.attachment-chip {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.7rem;
+  background: rgba(124, 58, 237, 0.12);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--accent-purple);
+  font-size: 0.78rem;
+  width: fit-content;
+  max-width: 100%;
+}
+
+.attachment-name {
+  color: var(--text-primary);
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment-meta {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.attachment-remove {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0 0.15rem;
+}
+
+.attachment-remove:hover {
+  color: var(--danger);
+}
+
 .input-wrapper textarea {
   width: 100%;
   padding: 0.875rem 1rem;
@@ -824,9 +934,45 @@ onMounted(() => {
   align-items: center;
 }
 
-.hint-text {
-  font-size: 0.75rem;
+.input-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.attach-btn {
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.attach-btn:hover:not(:disabled) {
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.attach-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.attach-hint {
+  font-size: 0.72rem;
   color: var(--text-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .send-btn {
