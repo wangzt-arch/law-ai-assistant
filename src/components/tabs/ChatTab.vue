@@ -90,10 +90,23 @@
                   <span class="citation-heading">本地法条核验</span>
                   <span class="citation-summary">{{ verifiedCount(msg.citationChecks) }} / {{ msg.citationChecks.length }} 条匹配</span>
                 </div>
-                <div v-for="(check, ci) in msg.citationChecks" :key="ci" class="citation-item" :class="check.status">
+                <div
+                  v-for="(check, ci) in msg.citationChecks"
+                  :key="ci"
+                  class="citation-item"
+                  :class="[check.status, { clickable: check.status === 'verified' }]"
+                  :role="check.status === 'verified' ? 'button' : undefined"
+                  :tabindex="check.status === 'verified' ? 0 : undefined"
+                  @click="openCitation(check)"
+                  @keydown.enter="openCitation(check)"
+                  @keydown.space.prevent="openCitation(check)"
+                >
                   <span class="citation-status">{{ citationLabel(check.status) }}</span>
                   <div class="citation-detail">
-                    <div class="citation-ref" :title="check.lawTitle">《{{ check.law }}》{{ check.articleLabel }}</div>
+                    <div class="citation-ref-row">
+                      <div class="citation-ref" :title="check.lawTitle">《{{ check.law }}》{{ check.articleLabel }}</div>
+                      <span v-if="check.status === 'verified'" class="citation-open">查看原文 →</span>
+                    </div>
                     <p v-if="check.snippet" class="citation-snippet">{{ check.snippet }}</p>
                     <p v-else class="citation-snippet">{{ check.status === 'law-missing' ? '本地法条库未收录该法律，请以国家法律法规数据库的官方文本为准。' : '本地法条库未收录该条文，请以国家法律法规数据库的官方文本为准。' }}</p>
                   </div>
@@ -205,6 +218,35 @@
         <p class="role-picker-note">法律顾问会标注可核查依据；无法确认时将明确提示“待核实”。</p>
       </section>
     </div>
+
+    <div v-if="articleOpen" class="article-mask" @click.self="closeArticle">
+      <section class="article-panel" role="dialog" aria-modal="true" aria-labelledby="article-panel-title">
+        <div class="article-header">
+          <div class="article-heading">
+            <span class="article-eyebrow">LOCAL LAW LIBRARY · 本地法条</span>
+            <h3 id="article-panel-title">{{ articleDetail?.law.title || articleFallback?.lawTitle }}</h3>
+            <div class="article-meta">
+              <span class="article-no">{{ articleDetail?.article.no || articleFallback?.articleLabel }}</span>
+              <span v-if="articleDetail?.law.articleCount">全法共 {{ articleDetail.law.articleCount }} 条</span>
+              <span v-if="articleDetail?.law.date">{{ articleDetail.law.date }} 版本</span>
+              <span v-if="articleDetail?.article.chapter">{{ articleDetail.article.chapter }}</span>
+            </div>
+          </div>
+          <button class="btn-icon" title="关闭" @click="closeArticle">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m18 6-12 12M6 6l12 12"/></svg>
+          </button>
+        </div>
+        <div class="article-body">
+          <p v-if="articleLoading" class="article-note">正在读取本地法条…</p>
+          <p v-else-if="articleError" class="article-note article-error">{{ articleError }}</p>
+          <p v-else class="article-text">{{ articleDetail?.article.text }}</p>
+        </div>
+        <div class="article-footer">
+          <span>内容来自本地法条库（整理自国家法律法规数据库）</span>
+          <a v-if="articleDetail?.law.source" :href="articleDetail.law.source" target="_blank" rel="noopener noreferrer">查看来源 →</a>
+        </div>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -213,6 +255,7 @@ import { ref, watch, nextTick, onMounted } from 'vue'
 import { marked } from 'marked'
 import { useAppStore } from '../../composables/useAppStore.js'
 import { readDocument } from '../../utils/readDocument.js'
+import { getArticleDetail } from '../../utils/legalCorpus.js'
 
 const store = useAppStore()
 const inputMessage = ref('')
@@ -220,6 +263,12 @@ const messagesContainer = ref(null)
 const autoScroll = ref(true)
 let lastScrollTop = 0
 const rolePickerOpen = ref(false)
+const articleOpen = ref(false)
+const articleLoading = ref(false)
+const articleError = ref('')
+const articleDetail = ref(null)
+const articleFallback = ref(null)
+let articleRequestSeq = 0
 const fileInput = ref(null)
 const pendingFile = ref(null)
 const readingFile = ref(false)
@@ -227,6 +276,38 @@ const readingFile = ref(false)
 function createRoleSession(roleId) {
   store.createChatSession(roleId)
   rolePickerOpen.value = false
+}
+
+async function openCitation(check) {
+  if (check.status !== 'verified') return
+  articleOpen.value = true
+  articleLoading.value = true
+  articleError.value = ''
+  articleDetail.value = null
+  articleFallback.value = {
+    lawTitle: check.lawTitle || check.law,
+    articleLabel: check.articleLabel
+  }
+  const seq = ++articleRequestSeq
+  try {
+    const detail = await getArticleDetail(check)
+    if (seq !== articleRequestSeq) return
+    if (detail) articleDetail.value = detail
+    else articleError.value = '本地法条库中未能读取该条原文。'
+  } catch (err) {
+    if (seq !== articleRequestSeq) return
+    articleError.value = '读取法条原文失败：' + (err.message || '未知错误')
+  } finally {
+    if (seq === articleRequestSeq) articleLoading.value = false
+  }
+}
+
+function closeArticle() {
+  articleRequestSeq++
+  articleOpen.value = false
+  articleDetail.value = null
+  articleFallback.value = null
+  articleError.value = ''
 }
 
 async function handleFileChange(e) {
@@ -818,6 +899,25 @@ onMounted(() => {
   border-bottom: none;
 }
 
+.citation-item.clickable {
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.citation-item.clickable:hover {
+  background: rgba(251, 248, 241, 0.72);
+}
+
+.citation-item.clickable:focus-visible {
+  outline: 2px solid var(--cinnabar);
+  outline-offset: 2px;
+}
+
+.citation-item.clickable:hover .citation-ref,
+.citation-item.clickable:hover .citation-open {
+  color: var(--cinnabar);
+}
+
 .citation-status {
   flex-shrink: 0;
   font-family: var(--font-mono);
@@ -844,6 +944,14 @@ onMounted(() => {
 
 .citation-detail {
   min-width: 0;
+  flex: 1;
+}
+
+.citation-ref-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
 .citation-ref {
@@ -851,6 +959,16 @@ onMounted(() => {
   font-size: 0.82rem;
   font-weight: 600;
   color: var(--ink);
+  transition: color 0.18s ease;
+}
+
+.citation-open {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.03em;
+  color: var(--cinnabar);
+  white-space: nowrap;
 }
 
 .citation-snippet {
@@ -1418,6 +1536,129 @@ onMounted(() => {
   color: var(--text-muted);
 }
 
+/* ===== 法条原文 ===== */
+.article-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(31, 36, 43, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.article-panel {
+  width: min(680px, 100%);
+  max-height: min(82vh, 760px);
+  display: flex;
+  flex-direction: column;
+  padding: 1.4rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+.article-panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--cinnabar);
+}
+
+.article-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding-bottom: 0.9rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.article-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--bronze);
+}
+
+.article-heading h3 {
+  margin-top: 0.25rem;
+  font-size: 1.08rem;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.article-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.8rem;
+  margin-top: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.article-no {
+  color: var(--cinnabar);
+  font-weight: 600;
+}
+
+.article-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1rem 0.15rem 1rem 0;
+}
+
+.article-text {
+  white-space: pre-wrap;
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  line-height: 1.95;
+  color: var(--ink-secondary);
+}
+
+.article-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.article-error {
+  color: var(--cinnabar);
+}
+
+.article-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--border-color);
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
+
+.article-footer a {
+  color: var(--cinnabar);
+  text-decoration: none;
+}
+
+.article-footer a:hover {
+  text-decoration: underline;
+}
+
 /* ===== 移动端 ===== */
 @media (max-width: 900px) {
   .chat-tab {
@@ -1506,6 +1747,15 @@ onMounted(() => {
 
   .role-card {
     min-height: 0;
+  }
+
+  .article-panel {
+    padding: 1.15rem;
+    max-height: calc(100vh - 3rem);
+  }
+
+  .article-text {
+    font-size: 0.85rem;
   }
 }
 

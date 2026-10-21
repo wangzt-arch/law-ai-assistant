@@ -421,6 +421,9 @@ export async function verifyCitations(text) {
     checks.push({
       law: law.shortName,
       lawTitle: law.title,
+      lawId: law.id,
+      articleNo: cite.n,
+      articleSuffix: cite.suffix,
       articleLabel: article ? `${article.no}${article.suffix || ''}` : `第${cite.numberCn}条${cite.suffix}`,
       status: article ? 'verified' : 'not-found',
       snippet: article ? article.text.slice(0, 160) : ''
@@ -428,4 +431,48 @@ export async function verifyCitations(text) {
   }
 
   return checks.slice(0, 12)
+}
+
+/**
+ * 读取核验结果中某条引用的完整原文。
+ * 新结果带有 lawId/articleNo；旧会话结果可从 lawTitle/articleLabel 反查。
+ */
+export async function getArticleDetail(check) {
+  await ensureCorpus()
+  if (!check) return null
+
+  const law = check.lawId
+    ? state.laws.find(item => item.id === check.lawId)
+    : findLaw(check.lawTitle || check.law || '')
+  if (!law) return null
+
+  let n = check.articleNo
+  let suffix = check.articleSuffix || ''
+  if (!n) {
+    const match = (check.articleLabel || '').match(/^第\s*([一二三四五六七八九十百千零〇两\d]+)\s*条(之[一二三四五六七八九十]+)?/)
+    if (!match) return null
+    n = parseCnNumber(match[1])
+    suffix = match[2] || ''
+  }
+
+  const article = law.articles.find(item => item.n === n && (item.suffix || '') === suffix)
+  if (!article) return null
+
+  return {
+    law: {
+      id: law.id,
+      title: law.title,
+      shortName: law.shortName,
+      date: law.date,
+      source: law.source,
+      articleCount: law.articles.length
+    },
+    article: {
+      n: article.n,
+      no: article.no,
+      suffix: article.suffix || '',
+      chapter: article.chapter || '',
+      text: article.text
+    }
+  }
 }

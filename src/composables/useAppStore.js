@@ -120,7 +120,7 @@ const currentChatRole = computed(() => {
 function loadSettings() {
   apiKey.value =
     localStorage.getItem("agnes_api_key") ||
-    "sk-KFwe3zkKdAkSFvFvnUs1uWlH4pWkFAzBHjqfSKNKsfTJAInc";
+    "sk-aCTzQt662XYTkN9HJEZMVIU8hcz1dlzGNM2LWhLGllX0cshU";
   baseUrl.value = localStorage.getItem("agnes_base_url") || DEFAULT_BASE_URL;
   setApiKey(apiKey.value);
   setBaseUrl(baseUrl.value);

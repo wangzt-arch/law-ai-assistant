@@ -8,6 +8,7 @@ import path from 'node:path'
  */
 
 const REPO_RAW = 'https://raw.githubusercontent.com/LawRefBook/Laws/master/'
+const REPO_TREE = 'https://github.com/LawRefBook/Laws/tree/master/'
 const OUT_DIR = path.resolve('src/data')
 const UA = 'Mozilla/5.0 (law-ai-assistant corpus builder)'
 
@@ -335,6 +336,12 @@ function rawUrl(relativePath) {
   return REPO_RAW + relativePath.split('/').map(encodeURIComponent).join('/')
 }
 
+function sourceUrl(files) {
+  if (files.length === 1) return rawUrl(files[0])
+  const dir = files[0].split('/').slice(0, -1).join('/')
+  return REPO_TREE + dir.split('/').map(encodeURIComponent).join('/')
+}
+
 async function fetchText(url, retries = 3) {
   for (let attempt = 1; attempt <= retries; attempt++) {
     try {
@@ -443,7 +450,7 @@ async function buildLaw(meta) {
     shortName: meta.shortName,
     category: meta.category,
     date: meta.date,
-    source: rawUrl(meta.files[0]),
+    source: sourceUrl(meta.files),
     aliases: [meta.title, meta.shortName, ...(meta.aliases || [])],
     articles
   }
