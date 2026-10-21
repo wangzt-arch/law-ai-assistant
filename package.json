@@ -12,7 +12,7 @@
     "corpus:update": "node scripts/build-law-corpus.mjs",
     "cases:update": "node scripts/build-case-corpus.mjs",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
-    "electron:build": "npm run build && electron-packager . 法律AI助手-小卢 --platform=win32 --arch=x64 --out=dist --icon=src/images/star.ico --overwrite --asar"
+    "electron:build": "npm run build && node scripts/pack-electron.mjs"
   },
   "dependencies": {
     "mammoth": "^1.13.0",
