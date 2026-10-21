@@ -56,7 +56,7 @@
       </div>
 
       <div class="chat-container">
-        <div ref="messagesContainer" class="messages-list">
+        <div ref="messagesContainer" class="messages-list" @scroll="handleMessagesScroll">
           <div v-if="store.chatMessages.value.length === 0" class="empty-chat">
             <div class="empty-mark" aria-hidden="true"></div>
             <p class="empty-title">先查来源，再下结论。</p>
@@ -214,6 +214,8 @@ import { readDocument } from '../../utils/readDocument.js'
 const store = useAppStore()
 const inputMessage = ref('')
 const messagesContainer = ref(null)
+const autoScroll = ref(true)
+let lastScrollTop = 0
 const rolePickerOpen = ref(false)
 const fileInput = ref(null)
 const pendingFile = ref(null)
@@ -327,10 +329,26 @@ async function sendMessage() {
   scrollToBottom()
 }
 
-function scrollToBottom() {
+function handleMessagesScroll() {
+  const el = messagesContainer.value
+  if (!el) return
+  const distanceToBottom = el.scrollHeight - el.scrollTop - el.clientHeight
+  if (distanceToBottom <= 8) {
+    autoScroll.value = true
+  } else if (el.scrollTop < lastScrollTop) {
+    autoScroll.value = false
+  }
+  lastScrollTop = el.scrollTop
+}
+
+function scrollToBottom(force = false) {
+  if (force) autoScroll.value = true
+  if (!autoScroll.value) return
   nextTick(() => {
+    if (!autoScroll.value) return
     if (messagesContainer.value) {
       messagesContainer.value.scrollTop = messagesContainer.value.scrollHeight
+      lastScrollTop = messagesContainer.value.scrollTop
     }
   })
 }
@@ -346,12 +364,18 @@ watch(() => {
 })
 
 // 监听消息数量变化
-watch(() => store.chatMessages.value.length, () => {
-  scrollToBottom()
+watch(() => store.chatMessages.value.length, (length, previousLength) => {
+  if (length !== previousLength) scrollToBottom(true)
+})
+
+// 切换会话时回到该会话底部
+watch(() => store.currentChatSessionId.value, () => {
+  lastScrollTop = 0
+  scrollToBottom(true)
 })
 
 onMounted(() => {
-  scrollToBottom()
+  scrollToBottom(true)
 })
 </script>
 
