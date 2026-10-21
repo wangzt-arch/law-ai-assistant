@@ -39,22 +39,6 @@ function getApiBaseUrl() {
 }
 
 /**
- * 获取当前配置的原始 baseUrl（用于拼接独立于 /v1 前缀的端点，如 /agnesapi）
- * @returns {string} 原始配置的基础地址
- */
-export function getBaseUrlRaw() {
-  return baseUrl.value
-}
-
-/**
- * 获取 API Key 原始值
- * @returns {string} API Key
- */
-export function getApiKeyRaw() {
-  return apiKey.value
-}
-
-/**
  * 带重试机制的 fetch 请求
  * 支持指数退避策略，自动处理可重试状态码（502/503/504/429）
  * @param {string} url - 请求地址
@@ -108,4 +92,14 @@ export async function request(path, options = {}, retryConfig = {}) {
     ...options.headers
   }
   return fetchWithRetry(url, { ...options, headers }, retryConfig)
+}
+
+/**
+ * 测试 API 连接状态
+ * 调用 /models 接口验证 API Key 是否有效
+ * @returns {Promise<boolean>} 连接是否成功
+ */
+export async function testConnection() {
+  const res = await request('/models')
+  return res.ok
 }

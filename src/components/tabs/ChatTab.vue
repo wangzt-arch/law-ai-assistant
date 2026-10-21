@@ -81,16 +81,6 @@
                 <span v-if="msg.role === 'assistant'" class="model-label">agnes-2.5-flash</span>
               </div>
               <div class="message-body" v-html="renderMessage(msg, idx)"></div>
-              <div v-if="msg.role === 'assistant' && (msg.displayContent || msg.content)" class="message-actions">
-                <button v-if="store.hasChatPrompt(msg.content, 'image')" title="提取生图提示词区块" @click="store.useChatPrompt(msg.content, 'image')">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="3" rx="2"/><circle cx="9" cy="9" r="1.5"/><path d="m21 15-3.5-3.5a2 2 0 0 0-2.8 0L6 21"/></svg>
-                  提取生图提示词
-                </button>
-                <button v-if="store.hasChatPrompt(msg.content, 'video')" title="提取生视频提示词区块" @click="store.useChatPrompt(msg.content, 'video')">
-                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/></svg>
-                  提取生视频提示词
-                </button>
-              </div>
               <div v-if="msg.role === 'assistant' && store.chatLoading.value && idx === store.chatMessages.value.length - 1 && !(msg.displayContent || msg.content)" class="typing-indicator">
                 <span class="typing-dot"></span>
                 <span class="typing-dot"></span>
@@ -622,32 +612,6 @@ onMounted(() => {
 
 .message-body :deep(p:last-child) {
   margin-bottom: 0;
-}
-
-.message-actions {
-  display: flex;
-  gap: 0.45rem;
-  margin-top: 0.7rem;
-}
-
-.message-actions button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.32rem 0.55rem;
-  color: var(--text-muted);
-  background: transparent;
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.72rem;
-}
-
-.message-actions button:hover {
-  color: #d8ccff;
-  border-color: var(--accent-purple);
-  background: rgba(124, 58, 237, 0.1);
 }
 
 .message-body :deep(h1),
