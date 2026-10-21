@@ -277,8 +277,10 @@ function createWindow() {
         padding-right: 160px !important;
         -webkit-app-region: drag;
       }
+      .app-header .header-right,
       .app-header .header-nav,
       .app-header .nav-btn,
+      .app-header .theme-toggle,
       .app-header .logo-icon,
       .app-header .logo-text {
         -webkit-app-region: no-drag;
