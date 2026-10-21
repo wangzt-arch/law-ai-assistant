@@ -491,16 +491,16 @@ onMounted(() => {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 1.25rem 1.5rem 0;
+  padding: 0.2rem 1.5rem 0;
 }
 
 .chat-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
+  /* gap: 1rem; */
   flex-wrap: wrap;
-  padding-bottom: 0.85rem;
+  /* padding-bottom: 0.85rem; */
   border-bottom: 1px solid var(--border-color);
   flex-shrink: 0;
 }
@@ -515,7 +515,7 @@ onMounted(() => {
   color: var(--ink);
   letter-spacing: 0.02em;
   margin: 0.12rem 0 0.15rem;
-  line-height: 1.3;
+  line-height: 1;
 }
 
 .page-desc {
@@ -940,14 +940,14 @@ onMounted(() => {
 /* ===== 输入区 ===== */
 .chat-input-area {
   flex-shrink: 0;
-  padding: 0.9rem 0 1.1rem;
+  padding: 0.1rem 0 0.2rem;
   border-top: 1px solid var(--border-color);
   background: transparent;
 }
 
 .input-wrapper {
   position: relative;
-  margin-bottom: 0.7rem;
+  margin-bottom: 0.1rem;
 }
 
 .attachment-chip {
@@ -996,7 +996,7 @@ onMounted(() => {
 
 .input-wrapper textarea {
   width: 100%;
-  padding: 0.8rem 0.95rem;
+  padding: 1rem;
   padding-right: 2.4rem;
   border: 1px solid var(--border-color);
   background: var(--bg-input);
@@ -1004,7 +1004,7 @@ onMounted(() => {
   border-radius: var(--radius-sm);
   font-size: 0.9rem;
   font-family: var(--font-sans);
-  line-height: 1.7;
+  line-height: 1.2;
   resize: none;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
