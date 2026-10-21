@@ -1,4 +1,4 @@
-# AI Creator Studio
+# 法律AI助手-小卢
 
 基于 Vue 3、Vite 和 Electron 的 AI 对话客户端，可通过兼容 Agnes API 的服务完成流式对话。项目既可作为浏览器应用运行，也可打包为 Windows 桌面应用。
 

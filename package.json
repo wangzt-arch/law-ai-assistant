@@ -1,7 +1,7 @@
 {
   "name": "agnes-video-agent",
   "version": "2.0.0",
-  "description": "创意工作室 - AI图像和视频生成工具",
+  "description": "法律AI助手-小卢 - AI 法律对话助手",
   "author": "Agnes AI",
   "type": "module",
   "main": "src/electron/main.cjs",
@@ -10,7 +10,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "electron:dev": "concurrently \"npm run dev\" \"wait-on http://localhost:3000 && cross-env NODE_ENV=development electron .\"",
-    "electron:build": "npm run build && node -e \"const fs=require('fs');['dist','release','build-output','CreativeStudio-win32-x64'].forEach(d=>{if(fs.existsSync(d))fs.rmSync(d,{recursive:true,force:true,maxRetries:5,retryDelay:100});})\" && npx electron-packager . CreativeStudio --platform=win32 --arch=x64 --out=dist --icon=src/images/star.ico --overwrite --asar"
+    "electron:build": "npm run build && node -e \"const fs=require('fs');['dist','release','build-output','法律AI助手-小卢-win32-x64'].forEach(d=>{if(fs.existsSync(d))fs.rmSync(d,{recursive:true,force:true,maxRetries:5,retryDelay:100});})\" && npx electron-packager . 法律AI助手-小卢 --platform=win32 --arch=x64 --out=dist --icon=src/images/star.ico --overwrite --asar"
   },
   "dependencies": {
     "marked": "^18.0.7",
@@ -28,7 +28,7 @@
   },
   "build": {
     "appId": "com.agnes.creator-studio",
-    "productName": "创意工作室",
+    "productName": "法律AI助手-小卢",
     "directories": {
       "output": "dist",
       "buildResources": "build"

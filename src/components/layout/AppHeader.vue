@@ -8,8 +8,7 @@
           </svg>
         </div>
         <div class="logo-text">
-          <h1>AI Creator</h1>
-          <span class="subtitle">AI Creator Studio</span>
+          <h1>法律AI助手-小卢</h1>
         </div>
       </div>
       <nav class="header-nav">

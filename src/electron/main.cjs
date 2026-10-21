@@ -5,7 +5,7 @@ const url = require('url')
 let mainWindow
 let tray = null
 
-app.setName('创意工作室')
+app.setName('法律AI助手-小卢')
 
 const template = [
   {
@@ -198,13 +198,13 @@ const template = [
     label: '帮助',
     submenu: [
       {
-        label: '关于创意工作室',
+        label: '关于法律AI助手-小卢',
         click: async () => {
           const { dialog } = require('electron')
           await dialog.showMessageBox({
-            title: '关于创意工作室',
-            message: '创意工作室 v1.0.0',
-            detail: '一款强大的AI图像和视频生成工具',
+            title: '关于法律AI助手-小卢',
+            message: '法律AI助手-小卢 v1.0.0',
+            detail: '一款简洁的 AI 法律对话助手',
             icon: path.join(__dirname, '../images/star.ico')
           })
         }
@@ -215,7 +215,7 @@ const template = [
           const { dialog } = require('electron')
           await dialog.showMessageBox({
             title: '检查更新',
-            message: '创意工作室',
+            message: '法律AI助手-小卢',
             detail: '当前版本: 1.0.0\n已是最新版本',
             icon: path.join(__dirname, '../images/star.ico')
           })
@@ -247,7 +247,7 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.cjs')
     },
-    title: '创意工作室',
+    title: '法律AI助手-小卢',
     icon: path.join(__dirname, '../images/star.ico')
   })
 
@@ -285,9 +285,9 @@ function createWindow() {
     e.preventDefault()
     const result = await dialog.showMessageBox(mainWindow, {
       type: 'question',
-      title: '创意工作室',
+      title: '法律AI助手-小卢',
       icon: path.join(__dirname, '../images/star.ico'),
-      message: '确定要关闭创意工作室吗？',
+      message: '确定要关闭法律AI助手-小卢吗？',
       buttons: ['最小化到托盘', '直接关闭', '取消'],
       defaultId: 0,
       cancelId: 2,
@@ -314,7 +314,7 @@ function createWindow() {
 function createTray() {
   const iconPath = path.join(__dirname, '../images/star.ico')
   tray = new Tray(iconPath)
-  tray.setToolTip('创意工作室')
+  tray.setToolTip('法律AI助手-小卢')
   const contextMenu = Menu.buildFromTemplate([
     { label: '显示主窗口', click: () => { mainWindow.show(); mainWindow.focus() } },
     { type: 'separator' },
