@@ -45,27 +45,27 @@ defineEmits(['dismiss'])
 
 .error-card {
   background: var(--bg-card);
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--danger);
+  border-radius: var(--radius-sm);
   padding: 1rem 1.25rem;
   display: flex;
   align-items: flex-start;
   gap: 0.875rem;
-  box-shadow: var(--shadow-lg), 0 0 30px rgba(239, 68, 68, 0.08);
+  box-shadow: var(--shadow-lg);
   backdrop-filter: blur(12px);
 }
 
 .error-card.success {
-  border-color: rgba(34, 197, 94, 0.3);
-  box-shadow: var(--shadow-lg), 0 0 30px rgba(34, 197, 94, 0.08);
+  border-left-color: var(--success);
 }
 
 .error-icon {
   flex-shrink: 0;
   width: 36px;
   height: 36px;
-  border-radius: 50%;
-  background: rgba(239, 68, 68, 0.12);
+  border-radius: var(--radius-sm);
+  background: var(--cinnabar-soft);
   color: var(--danger);
   display: flex;
   align-items: center;
@@ -73,8 +73,8 @@ defineEmits(['dismiss'])
 }
 
 .error-card.success .error-icon {
-  background: rgba(34, 197, 94, 0.12);
-  color: #22c55e;
+  background: rgba(63, 106, 78, 0.1);
+  color: var(--success);
 }
 
 .error-content {
@@ -83,14 +83,15 @@ defineEmits(['dismiss'])
 }
 
 .error-content h4 {
+  font-family: var(--font-serif);
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--danger);
-  margin-bottom: 0.25rem;
+  color: var(--ink);
+  margin-bottom: 0.2rem;
 }
 
 .error-card.success .error-content h4 {
-  color: #22c55e;
+  color: var(--ink);
 }
 
 .error-content p {
@@ -104,7 +105,7 @@ defineEmits(['dismiss'])
   flex-shrink: 0;
   width: 28px;
   height: 28px;
-  border-radius: 50%;
+  border-radius: var(--radius-sm);
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -116,8 +117,8 @@ defineEmits(['dismiss'])
 }
 
 .error-close:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: var(--danger);
+  background: var(--cinnabar-soft);
+  color: var(--cinnabar);
 }
 
 .slide-in-enter-active,

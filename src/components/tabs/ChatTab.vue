@@ -3,11 +3,15 @@
     <!-- 会话侧边栏 -->
     <div class="sessions-sidebar">
       <div class="sessions-header">
-        <h3>对话列表</h3>
-        <button class="btn-icon" @click="rolePickerOpen = true" title="新建对话">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <div class="sessions-heading">
+          <span class="eyebrow">CASE FILES</span>
+          <h3>案卷目录</h3>
+        </div>
+        <button class="new-session-btn" @click="rolePickerOpen = true" title="新建对话">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 5v14M5 12h14"/>
           </svg>
+          <span>新建</span>
         </button>
       </div>
       <div class="sessions-list">
@@ -37,8 +41,9 @@
     <div class="chat-main">
       <div class="chat-header">
         <div class="header-title">
-          <h2>AI 对话</h2>
-          <p class="page-desc">{{ store.currentChatRole.value.name }} · {{ store.currentChatRole.value.description }}</p>
+          <span class="eyebrow">CONVERSATION · 对话卷宗</span>
+          <h2>{{ store.currentChatRole.value.name }}</h2>
+          <p class="page-desc">{{ store.currentChatRole.value.description }}</p>
         </div>
         <div class="header-actions">
           <button v-if="store.chatMessages.value.length > 0" class="btn-secondary" @click="store.clearChat">
@@ -53,13 +58,10 @@
       <div class="chat-container">
         <div ref="messagesContainer" class="messages-list">
           <div v-if="store.chatMessages.value.length === 0" class="empty-chat">
-            <div class="empty-icon">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-              </svg>
-            </div>
-            <p>开始与 AI 对话</p>
-            <p class="empty-hint">输入你的问题，Agnes-2.5-Flash 将为你提供帮助</p>
+            <div class="empty-mark" aria-hidden="true"></div>
+            <p class="empty-title">先查来源，再下结论。</p>
+            <p class="empty-hint">选择「法律顾问」陈述事实与争议焦点，或上传合同、判决书交给「文档阅读」提炼要点。</p>
+            <p class="empty-note">AI 输出仅供参考 · 不构成正式法律意见</p>
           </div>
 
           <div
@@ -67,18 +69,11 @@
             :key="msg.id || idx"
             :class="['message-item', msg.role]"
           >
-            <div class="message-avatar">
-              <svg v-if="msg.role === 'user'" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-              </svg>
-              <svg v-else width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="m9.87 16.17 4.93-4.93-4.93 4.93z"/><path d="M12 12c2-2 2-2 5-2s2 2 3 5-2 2-5 5-3-2-5-5 2-3 5-3z"/><path d="M12 12c-2-2-2-2-5-2s-2 2-3 5 2 2 5 5 3-2 5-5-2-3-5-3z"/>
-              </svg>
-            </div>
+            <div class="message-avatar" aria-hidden="true">{{ msg.role === 'user' ? '你' : '卢' }}</div>
             <div class="message-content">
               <div class="message-header">
-                <span class="role-label">{{ msg.role === 'user' ? '你' : 'Agnes' }}</span>
-                <span v-if="msg.role === 'assistant'" class="model-label">agnes-2.5-flash</span>
+                <span class="role-label">{{ msg.role === 'user' ? '你' : `小卢 · ${store.currentChatRole.value.name}` }}</span>
+                <span v-if="msg.role === 'assistant'" class="model-label">AI 生成</span>
               </div>
               <div class="message-body" v-html="renderMessage(msg, idx)"></div>
               <div v-if="msg.attachmentName" class="message-attachment">
@@ -108,7 +103,7 @@
             </div>
             <textarea
               v-model="inputMessage"
-              placeholder="输入你的问题,回车发送..."
+              placeholder="输入问题或陈述事实，Enter 发送..."
               rows="3"
               @keydown.enter="sendMessage"
               :disabled="store.chatLoading.value"
@@ -163,6 +158,7 @@
             <span>{{ role.description }}</span>
           </button>
         </div>
+        <p class="role-picker-note">法律顾问会标注可核查依据；无法确认时将明确提示“待核实”。</p>
       </section>
     </div>
   </div>
@@ -303,41 +299,132 @@ onMounted(() => {
 <style scoped>
 .chat-tab {
   display: flex;
-  gap: 1.5rem;
   height: 100%;
   min-height: 0;
-  animation: tab-enter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-@keyframes tab-enter {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 会话侧边栏 */
-.sessions-sidebar {
-  width: 240px;
-  flex-shrink: 0;
   background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  animation: tab-enter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes tab-enter {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.2em;
+  color: var(--bronze);
+  text-transform: uppercase;
+}
+
+/* ===== 案卷目录 ===== */
+.sessions-sidebar {
+  width: 252px;
+  flex-shrink: 0;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
   display: flex;
   flex-direction: column;
-  max-height: calc(100vh - 130px);
+  min-height: 0;
 }
 
 .sessions-header {
-  padding: 1rem;
+  padding: 1.05rem 1.1rem 0.85rem;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-end;
+  gap: 0.6rem;
+}
+
+.sessions-heading {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
 }
 
 .sessions-header h3 {
-  font-size: 0.9rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+.new-session-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.2rem 0;
+  background: transparent;
+  border: none;
+  color: var(--cinnabar);
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.new-session-btn:hover {
+  color: var(--cinnabar-dark);
+}
+
+.sessions-list {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.session-item {
+  padding: 0.7rem 0.9rem;
+  border-left: 2px solid transparent;
+  border-bottom: 1px solid rgba(185, 174, 153, 0.35);
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.session-item:hover {
+  background: rgba(251, 248, 241, 0.72);
+}
+
+.session-item.active {
+  background: var(--bg-card);
+  border-left-color: var(--cinnabar);
+}
+
+.session-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.session-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.session-meta {
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+  letter-spacing: 0.02em;
+}
+
+.session-role {
+  color: var(--bronze);
+  margin-right: 0.3rem;
 }
 
 .btn-icon {
@@ -345,200 +432,93 @@ onMounted(() => {
   border: none;
   color: var(--text-muted);
   cursor: pointer;
-  padding: 0.375rem;
+  padding: 0.3rem;
   border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .btn-icon:hover {
-  background: var(--bg-input);
-  color: var(--accent-purple);
-}
-
-.sessions-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 0.5rem;
-}
-
-.session-item {
-  padding: 0.75rem;
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.5rem;
-  margin-bottom: 0.25rem;
-}
-
-.session-item:hover {
-  background: var(--bg-input);
-}
-
-.session-item.active {
-  background: var(--gradient-primary);
-}
-
-.session-item.active .session-title,
-.session-item.active .session-meta {
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.session-info {
-  flex: 1;
-  overflow: hidden;
-}
-
-.session-title {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.session-meta {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  margin-top: 0.25rem;
-}
-
-.session-role {
-  color: var(--accent-cyan);
-  margin-right: 0.35rem;
+  background: var(--cinnabar-soft);
+  color: var(--cinnabar);
 }
 
 .delete-btn {
   opacity: 0;
-  transition: opacity 0.2s ease;
+  transition: opacity 0.2s ease, color 0.2s ease;
 }
 
-.session-item:hover .delete-btn {
+.session-item:hover .delete-btn,
+.session-item.active .delete-btn {
   opacity: 1;
 }
 
-.session-item.active .delete-btn {
-  color: rgba(255, 255, 255, 0.8);
-}
-
-/* 对话主区域 */
+/* ===== 对话主区域 ===== */
 .chat-main {
   flex: 1;
   min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1.5rem 0;
 }
 
 .chat-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 1rem;
+  gap: 1rem;
   flex-wrap: wrap;
-  gap: 1rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
 }
 
-.role-picker-mask {
-  position: fixed;
-  inset: 0;
-  z-index: 250;
-  display: grid;
-  place-items: center;
-  padding: 1.5rem;
-  background: rgba(0, 0, 0, 0.66);
-  backdrop-filter: blur(8px);
+.header-title {
+  min-width: 0;
 }
-
-.role-picker {
-  width: min(620px, 100%);
-  padding: 1.25rem;
-  background: var(--bg-card);
-  border: 1px solid var(--border-active);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-
-.role-picker-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1.1rem;
-}
-
-.role-picker-eyebrow {
-  display: block;
-  color: var(--accent-cyan);
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-}
-
-.role-picker h3 { margin-top: 0.25rem; font-size: 1.15rem; }
-
-.role-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.65rem;
-}
-
-.role-card {
-  min-height: 92px;
-  padding: 0.9rem;
-  color: var(--text-primary);
-  text-align: left;
-  background: var(--bg-input);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-.role-card:hover { border-color: var(--accent-purple); background: rgba(124, 58, 237, 0.15); }
-.role-card strong, .role-card span { display: block; }
-.role-card strong { font-size: 0.88rem; }
-.role-card span { margin-top: 0.3rem; color: var(--text-muted); font-size: 0.75rem; line-height: 1.45; }
 
 .header-title h2 {
-  font-size: 1.75rem;
+  font-size: 1.7rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 0.25rem;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+  margin: 0.12rem 0 0.15rem;
+  line-height: 1.3;
 }
 
 .page-desc {
   color: var(--text-muted);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 .header-actions {
   display: flex;
   gap: 0.5rem;
+  align-items: center;
+  padding-top: 0.4rem;
 }
 
 .chat-container {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 220px);
-  min-height: 500px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
 }
 
 .messages-list {
   flex: 1;
+  min-height: 0;
   overflow-y: auto;
-  padding: 1.5rem;
+  padding: 1.4rem 0.15rem 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
+  gap: 1.4rem;
 }
 
+/* ===== 空白卷宗 ===== */
 .empty-chat {
   flex: 1;
   display: flex;
@@ -546,35 +526,49 @@ onMounted(() => {
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: var(--text-muted);
+  padding: 2rem 1rem;
 }
 
-.empty-icon {
-  color: var(--accent-purple);
+.empty-mark {
+  width: 34px;
+  height: 2px;
+  background: var(--cinnabar);
   margin-bottom: 1.25rem;
-  opacity: 0.2;
 }
 
-.empty-chat > p:first-of-type {
-  font-size: 1.1rem;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: 0.5rem;
+.empty-title {
+  font-family: var(--font-serif);
+  font-size: 1.42rem;
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.06em;
 }
 
 .empty-hint {
+  max-width: 430px;
+  margin-top: 0.65rem;
+  color: var(--text-secondary);
   font-size: 0.85rem;
-  opacity: 0.7;
+  line-height: 1.85;
 }
 
+.empty-note {
+  margin-top: 1.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  color: var(--bronze);
+}
+
+/* ===== 消息 ===== */
 .message-item {
   display: flex;
-  gap: 0.75rem;
-  animation: message-enter 0.3s ease;
+  gap: 0.85rem;
+  animation: message-enter 0.28s ease;
 }
 
 @keyframes message-enter {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(5px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
@@ -582,95 +576,101 @@ onMounted(() => {
   flex-direction: row-reverse;
 }
 
-.message-item.user .message-content {
-  background: var(--gradient-primary);
-}
-
 .message-avatar {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-}
-
-.message-item.user .message-avatar {
-  color: var(--accent-purple);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card);
+  color: var(--text-muted);
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  line-height: 1;
 }
 
 .message-item.assistant .message-avatar {
-  color: var(--accent-blue);
+  background: var(--cinnabar);
+  border-color: var(--cinnabar);
+  color: #fbf8f1;
+  box-shadow: inset 0 0 0 1px rgba(251, 248, 241, 0.45);
 }
 
 .message-content {
-  max-width: 70%;
-  padding: 0.875rem 1rem;
-  border-radius: var(--radius-md);
-  background: var(--bg-secondary);
+  min-width: 0;
+  max-width: 82%;
 }
 
 .message-item.user .message-content {
-  border-radius: var(--radius-md) 0 var(--radius-md) var(--radius-md);
+  max-width: 72%;
+  padding: 0.75rem 0.95rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
 }
 
 .message-item.assistant .message-content {
-  border-radius: 0 var(--radius-md) var(--radius-md) var(--radius-md);
+  padding-left: 1rem;
+  border-left: 1px solid var(--border-strong);
 }
 
 .message-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.375rem;
+  margin-bottom: 0.3rem;
 }
 
 .role-label {
-  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  font-size: 0.63rem;
   font-weight: 600;
-  color: var(--text-secondary);
+  letter-spacing: 0.1em;
+  color: var(--bronze);
 }
 
 .message-item.user .role-label {
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--text-muted);
 }
 
 .model-label {
-  font-size: 0.65rem;
+  font-family: var(--font-mono);
+  font-size: 0.57rem;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
-  background: var(--bg-input);
-  padding: 0.125rem 0.375rem;
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
+  padding: 0.06rem 0.3rem;
+  line-height: 1.5;
 }
 
 .message-body {
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: var(--text-primary);
+  font-size: 0.92rem;
+  line-height: 1.85;
+  color: var(--ink);
   word-wrap: break-word;
-}
-
-.message-item.user .message-body {
-  color: #fff;
 }
 
 .message-attachment {
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-top: 0.5rem;
-  padding: 0.25rem 0.55rem;
+  margin-top: 0.55rem;
+  padding: 0.22rem 0.5rem;
+  background: var(--cinnabar-soft);
+  border: 1px solid rgba(154, 46, 36, 0.16);
   border-radius: var(--radius-sm);
-  background: rgba(255, 255, 255, 0.16);
-  color: rgba(255, 255, 255, 0.9);
-  font-size: 0.72rem;
+  color: var(--cinnabar-dark);
+  font-size: 0.7rem;
   word-break: break-all;
 }
 
 /* Markdown 渲染样式 */
 .message-body :deep(p) {
-  margin: 0.5rem 0;
+  margin: 0.55rem 0;
 }
 
 .message-body :deep(p:first-child) {
@@ -685,75 +685,78 @@ onMounted(() => {
 .message-body :deep(h2),
 .message-body :deep(h3),
 .message-body :deep(h4) {
-  margin: 1rem 0 0.5rem;
+  font-family: var(--font-serif);
+  margin: 1.1rem 0 0.5rem;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
+  color: var(--ink);
 }
 
 .message-body :deep(h1) { font-size: 1.3rem; }
 .message-body :deep(h2) { font-size: 1.15rem; }
-.message-body :deep(h3) { font-size: 1.05rem; }
+.message-body :deep(h3) { font-size: 1.04rem; }
 
 .message-body :deep(ul),
 .message-body :deep(ol) {
-  padding-left: 1.5rem;
+  padding-left: 1.45rem;
   margin: 0.5rem 0;
 }
 
 .message-body :deep(li) {
-  margin: 0.25rem 0;
+  margin: 0.3rem 0;
 }
 
 .message-body :deep(blockquote) {
-  border-left: 3px solid var(--accent-purple);
-  padding: 0.5rem 1rem;
-  margin: 0.5rem 0;
-  background: rgba(124, 58, 237, 0.05);
-  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  border-left: 2px solid var(--cinnabar);
+  padding: 0.5rem 0.9rem;
+  margin: 0.6rem 0;
+  background: var(--cinnabar-soft);
+  color: var(--text-secondary);
 }
 
 .message-body :deep(code) {
-  background: rgba(124, 58, 237, 0.15);
-  padding: 0.125rem 0.375rem;
-  border-radius: 3px;
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 0.82rem;
-}
-
-.message-item.user :deep(code) {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.08rem 0.32rem;
+  border-radius: 2px;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
 }
 
 .message-body :deep(pre) {
-  background: var(--bg-primary);
-  padding: 0.875rem 1rem;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  padding: 0.85rem 1rem;
   border-radius: var(--radius-sm);
   overflow-x: auto;
-  margin: 0.5rem 0;
+  margin: 0.6rem 0;
 }
 
 .message-body :deep(pre code) {
   background: transparent;
+  border: none;
   padding: 0;
-  font-size: 0.82rem;
-  line-height: 1.6;
+  font-size: 0.8rem;
+  line-height: 1.65;
 }
 
 .message-body :deep(table) {
   border-collapse: collapse;
-  margin: 0.5rem 0;
+  margin: 0.6rem 0;
   width: 100%;
+  font-size: 0.84rem;
 }
 
 .message-body :deep(th),
 .message-body :deep(td) {
   border: 1px solid var(--border-color);
-  padding: 0.5rem 0.75rem;
+  padding: 0.45rem 0.65rem;
   text-align: left;
 }
 
 .message-body :deep(th) {
-  background: var(--bg-input);
+  background: var(--bg-secondary);
+  font-family: var(--font-serif);
   font-weight: 600;
 }
 
@@ -764,16 +767,18 @@ onMounted(() => {
 }
 
 .message-body :deep(a) {
-  color: var(--accent-purple);
-  text-decoration: none;
+  color: var(--cinnabar);
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .message-body :deep(a:hover) {
-  text-decoration: underline;
+  color: var(--cinnabar-dark);
 }
 
 .message-body :deep(strong) {
-  font-weight: 600;
+  font-weight: 700;
+  color: var(--ink);
 }
 
 .message-body :deep(img) {
@@ -781,43 +786,16 @@ onMounted(() => {
   border-radius: var(--radius-sm);
 }
 
-/* 旧的内联代码和代码块样式保留兼容 */
-.message-body :deep(code.inline-code) {
-  background: rgba(124, 58, 237, 0.2);
-  padding: 0.125rem 0.375rem;
-  border-radius: 3px;
-  font-family: 'Fira Code', monospace;
-  font-size: 0.8rem;
-}
-
-.message-item.user :deep(code.inline-code) {
-  background: rgba(255, 255, 255, 0.2);
-}
-
-.message-body :deep(pre.code-block) {
-  background: var(--bg-primary);
-  padding: 0.75rem 1rem;
-  border-radius: var(--radius-sm);
-  overflow-x: auto;
-  margin: 0.5rem 0;
-}
-
-.message-body :deep(pre.code-block code) {
-  font-family: 'Fira Code', monospace;
-  font-size: 0.8rem;
-  line-height: 1.6;
-}
-
 .typing-indicator {
   display: flex;
   gap: 4px;
-  padding-top: 0.5rem;
+  padding-top: 0.45rem;
 }
 
 .typing-dot {
-  width: 6px;
-  height: 6px;
-  background: var(--accent-purple);
+  width: 5px;
+  height: 5px;
+  background: var(--cinnabar);
   border-radius: 50%;
   animation: typing-bounce 1.4s infinite ease-in-out both;
 }
@@ -830,15 +808,17 @@ onMounted(() => {
   40% { transform: scale(1); }
 }
 
+/* ===== 输入区 ===== */
 .chat-input-area {
-  padding: 1rem 1.5rem;
+  flex-shrink: 0;
+  padding: 0.9rem 0 1.1rem;
   border-top: 1px solid var(--border-color);
-  background: var(--bg-card);
+  background: transparent;
 }
 
 .input-wrapper {
   position: relative;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.7rem;
 }
 
 .attachment-chip {
@@ -846,18 +826,18 @@ onMounted(() => {
   align-items: center;
   gap: 0.45rem;
   margin-bottom: 0.5rem;
-  padding: 0.4rem 0.7rem;
-  background: rgba(124, 58, 237, 0.12);
-  border: 1px solid var(--border-color);
+  padding: 0.38rem 0.65rem;
+  background: var(--bg-secondary);
+  border: 1px dashed var(--border-strong);
   border-radius: var(--radius-sm);
-  color: var(--accent-purple);
-  font-size: 0.78rem;
+  color: var(--bronze);
+  font-size: 0.76rem;
   width: fit-content;
   max-width: 100%;
 }
 
 .attachment-name {
-  color: var(--text-primary);
+  color: var(--ink);
   max-width: 280px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -865,8 +845,9 @@ onMounted(() => {
 }
 
 .attachment-meta {
+  font-family: var(--font-mono);
   color: var(--text-muted);
-  font-size: 0.7rem;
+  font-size: 0.64rem;
   white-space: nowrap;
 }
 
@@ -881,27 +862,29 @@ onMounted(() => {
 }
 
 .attachment-remove:hover {
-  color: var(--danger);
+  color: var(--cinnabar);
 }
 
 .input-wrapper textarea {
   width: 100%;
-  padding: 0.875rem 1rem;
-  padding-right: 2.5rem;
+  padding: 0.8rem 0.95rem;
+  padding-right: 2.4rem;
   border: 1px solid var(--border-color);
   background: var(--bg-input);
   color: var(--text-primary);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   font-size: 0.9rem;
+  font-family: var(--font-sans);
+  line-height: 1.7;
   resize: none;
-  transition: all 0.2s ease;
-  font-family: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
 .input-wrapper textarea:focus {
   outline: none;
-  border-color: var(--accent-purple);
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  border-color: var(--cinnabar);
+  background: var(--bg-input-focus);
+  box-shadow: 0 0 0 3px var(--cinnabar-soft);
 }
 
 .input-wrapper textarea:disabled {
@@ -909,9 +892,13 @@ onMounted(() => {
   cursor: not-allowed;
 }
 
+.input-wrapper textarea::placeholder {
+  color: var(--text-muted);
+}
+
 .clear-input {
   position: absolute;
-  right: 0.75rem;
+  right: 0.7rem;
   top: 50%;
   transform: translateY(-50%);
   background: transparent;
@@ -920,18 +907,19 @@ onMounted(() => {
   cursor: pointer;
   padding: 0.25rem;
   border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, background 0.2s ease;
 }
 
 .clear-input:hover {
-  color: var(--accent-purple);
-  background: rgba(124, 58, 237, 0.1);
+  color: var(--cinnabar);
+  background: var(--cinnabar-soft);
 }
 
 .input-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 1rem;
 }
 
 .input-tools {
@@ -942,33 +930,35 @@ onMounted(() => {
 }
 
 .attach-btn {
-  width: 34px;
-  height: 34px;
+  width: 32px;
+  height: 32px;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--bg-input);
-  border: 1px solid var(--border-color);
+  background: transparent;
+  border: 1px solid var(--border-strong);
   border-radius: var(--radius-sm);
   color: var(--text-secondary);
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .attach-btn:hover:not(:disabled) {
-  border-color: var(--accent-purple);
-  color: var(--accent-purple);
-  background: rgba(124, 58, 237, 0.1);
+  border-color: var(--cinnabar);
+  color: var(--cinnabar);
+  background: var(--cinnabar-soft);
 }
 
 .attach-btn:disabled {
-  opacity: 0.5;
+  opacity: 0.45;
   cursor: not-allowed;
 }
 
 .attach-hint {
-  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  font-size: 0.61rem;
+  letter-spacing: 0.03em;
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -978,7 +968,8 @@ onMounted(() => {
 .send-btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
+  flex-shrink: 0;
 }
 
 .spin-icon {
@@ -989,31 +980,158 @@ onMounted(() => {
   to { transform: rotate(360deg); }
 }
 
+/* ===== 角色选择 ===== */
+.role-picker-mask {
+  position: fixed;
+  inset: 0;
+  z-index: 250;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: rgba(31, 36, 43, 0.45);
+  backdrop-filter: blur(4px);
+}
+
+.role-picker {
+  width: min(760px, 100%);
+  padding: 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+.role-picker::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--cinnabar);
+}
+
+.role-picker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.role-picker-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  color: var(--bronze);
+}
+
+.role-picker h3 {
+  margin-top: 0.2rem;
+  font-size: 1.25rem;
+  color: var(--ink);
+}
+
+.role-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.role-card {
+  min-height: 112px;
+  padding: 0.95rem;
+  color: var(--ink);
+  text-align: left;
+  background: var(--bg-input);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.role-card:hover {
+  border-color: var(--cinnabar);
+  background: var(--bg-card);
+  box-shadow: inset 2px 0 0 var(--cinnabar);
+}
+
+.role-card strong {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.role-card span {
+  display: block;
+  margin-top: 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  line-height: 1.65;
+}
+
+.role-picker-note {
+  margin-top: 1.1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* ===== 移动端 ===== */
 @media (max-width: 900px) {
   .chat-tab {
     flex-direction: column;
-    min-height: 0;
   }
 
   .sessions-sidebar {
     width: 100%;
-    max-height: 160px;
     flex-shrink: 0;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+  }
+
+  .sessions-header {
+    padding: 0.7rem 0.9rem 0.6rem;
+  }
+
+  .sessions-list {
+    display: flex;
+    gap: 0.35rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 0.75rem 0.65rem;
+    flex: none;
+  }
+
+  .session-item {
+    min-width: 185px;
+    max-width: 220px;
+    padding: 0.55rem 0.65rem;
+    border: 1px solid var(--border-color);
+    border-left-width: 2px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-card);
+  }
+
+  .session-item.active {
+    border-color: var(--cinnabar);
   }
 
   .chat-main {
     flex: 1;
     min-height: 0;
-    display: flex;
-    flex-direction: column;
+    padding: 1rem 1rem 0;
   }
 
   .chat-container {
     flex: 1;
-    height: auto;
     min-height: 0;
-    display: flex;
-    flex-direction: column;
   }
 
   .messages-list {
@@ -1022,21 +1140,51 @@ onMounted(() => {
     overflow-y: auto;
   }
 
-  .message-content {
-    max-width: 85%;
+  .message-item.user .message-content {
+    max-width: 88%;
+  }
+
+  .message-item.assistant .message-content {
+    max-width: 92%;
   }
 
   .chat-header {
-    flex-direction: column;
     align-items: flex-start;
-    gap: 0.75rem;
-    flex-shrink: 0;
+    gap: 0.6rem;
   }
 
-  .chat-input-area {
-    flex-shrink: 0;
+  .header-title h2 {
+    font-size: 1.45rem;
   }
 
-  .role-grid { grid-template-columns: 1fr; }
+  .role-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .role-picker {
+    width: min(560px, 100%);
+    padding: 1.15rem;
+    max-height: calc(100vh - 3rem);
+    overflow-y: auto;
+  }
+
+  .role-card {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 560px) {
+  .attach-hint { display: none; }
+  .empty-title { font-size: 1.2rem; }
+  .empty-hint { font-size: 0.8rem; }
+  .chat-main { padding: 0.85rem 0.75rem 0; }
+  .chat-input-area { padding: 0.75rem 0 0.85rem; }
+  .message-avatar { width: 26px; height: 26px; font-size: 0.72rem; }
+  .message-content { max-width: 86%; }
+  .message-item.user .message-content { max-width: 90%; }
+}
+
+@media (hover: none) {
+  .delete-btn { opacity: 1; }
 }
 </style>

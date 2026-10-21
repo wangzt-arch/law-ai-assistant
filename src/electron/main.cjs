@@ -237,11 +237,11 @@ function createWindow() {
     autoHideMenuBar: false,
     titleBarStyle: 'hidden',
     titleBarOverlay: {
-      color: '#0a0a0f',
-      symbolColor: '#ffffff',
+      color: '#f4f0e6',
+      symbolColor: '#1f242b',
       height: 32
     },
-    backgroundColor: '#0a0a0f',
+    backgroundColor: '#f4f0e6',
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,

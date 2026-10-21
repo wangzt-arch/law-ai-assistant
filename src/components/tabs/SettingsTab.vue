@@ -7,7 +7,10 @@
             <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.1a2 2 0 0 1-1-1.72v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
           </svg>
         </div>
-        <h2>API 设置</h2>
+        <div class="settings-heading">
+          <span class="settings-eyebrow">CONFIGURATION · 系统配置</span>
+          <h2>接口配置</h2>
+        </div>
       </div>
 
       <div class="form-group">
@@ -84,42 +87,56 @@ const store = useAppStore()
 
 <style scoped>
 .settings-tab {
-  animation: tab-enter 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: tab-enter 0.35s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 @keyframes tab-enter {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .settings-card {
-  max-width: 560px;
+  max-width: 620px;
   margin: 0 auto;
 }
 
 .settings-header {
   display: flex;
   align-items: center;
-  gap: 0.875rem;
-  margin-bottom: 1.75rem;
+  gap: 1rem;
+  margin-bottom: 1.7rem;
+  padding-bottom: 1.1rem;
+  border-bottom: 1px solid var(--border-color);
 }
 
 .settings-icon {
-  width: 40px;
-  height: 40px;
+  width: 42px;
+  height: 42px;
+  flex-shrink: 0;
   border-radius: var(--radius-sm);
-  background: var(--gradient-primary);
-  color: #fff;
+  background: transparent;
+  border: 1px solid var(--border-strong);
+  color: var(--cinnabar);
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.25);
+}
+
+.settings-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  letter-spacing: 0.2em;
+  color: var(--bronze);
+  text-transform: uppercase;
+  margin-bottom: 0.15rem;
 }
 
 .settings-header h2 {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  color: var(--ink);
+  letter-spacing: 0.02em;
 }
 
 .input-wrap {
@@ -143,61 +160,66 @@ const store = useAppStore()
   display: flex;
   align-items: center;
   gap: 1rem;
-  margin: 1.5rem 0;
+  margin: 1.4rem 0;
+  padding-top: 1.2rem;
+  border-top: 1px solid var(--border-color);
   flex-wrap: wrap;
 }
 
 .status-text {
-  font-size: 0.85rem;
-  font-weight: 500;
-  padding: 0.375rem 0.875rem;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  padding: 0.3rem 0.6rem;
   border-radius: var(--radius-sm);
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .status-text.success {
   color: var(--success);
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: rgba(63, 106, 78, 0.08);
+  border: 1px solid rgba(63, 106, 78, 0.24);
 }
 
 .status-text.error {
   color: var(--danger);
-  background: rgba(239, 68, 68, 0.1);
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: var(--cinnabar-soft);
+  border: 1px solid rgba(154, 46, 36, 0.24);
 }
 
 .info-box {
-  background: var(--bg-input);
-  border-radius: var(--radius-md);
-  padding: 1.5rem;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+  padding: 1.2rem 1.3rem;
   margin-top: 1.5rem;
   border: 1px solid var(--border-color);
+  border-left: 2px solid var(--bronze);
 }
 
 .info-header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 0.875rem;
-  color: var(--accent-purple);
+  margin-bottom: 0.75rem;
+  color: var(--bronze);
 }
 
 .info-header h4 {
+  font-family: var(--font-serif);
   font-size: 0.95rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: var(--ink);
 }
 
 .info-box ul {
   padding-left: 1.25rem;
   color: var(--text-secondary);
-  font-size: 0.85rem;
+  font-size: 0.82rem;
 }
 
 .info-box li {
-  margin-bottom: 0.5rem;
-  line-height: 1.6;
+  margin-bottom: 0.45rem;
+  line-height: 1.7;
 }
 
 .info-box li:last-child { margin-bottom: 0; }

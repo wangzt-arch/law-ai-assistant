@@ -2,23 +2,20 @@
   <header class="app-header">
     <div class="header-inner">
       <div class="logo-section">
-        <div class="logo-icon">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-          </svg>
-        </div>
+        <div class="logo-icon" aria-hidden="true">卢</div>
         <div class="logo-text">
-          <h1>法律AI助手-小卢</h1>
+          <h1>法律AI助手<span class="wordmark-name">-小卢</span></h1>
+          <span class="subtitle">LEGAL AI COUNSEL</span>
         </div>
       </div>
-      <nav class="header-nav">
+      <nav class="header-nav" aria-label="主导航">
         <button
           v-for="tab in tabs"
           :key="tab.key"
           :class="['nav-btn', { active: currentTab === tab.key }]"
           @click="$emit('switch-tab', tab.key)"
         >
-          <svg class="nav-icon-svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg"></svg>
+          <svg class="nav-icon-svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" v-html="tab.svg"></svg>
           <span>{{ tab.label }}</span>
         </button>
       </nav>
@@ -49,110 +46,135 @@ const tabs = [
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(10, 10, 15, 0.75);
-  backdrop-filter: blur(24px) saturate(1.2);
-  -webkit-backdrop-filter: blur(24px) saturate(1.2);
-  border-bottom: 1px solid var(--border-color);
+  background: rgba(244, 240, 230, 0.92);
+  backdrop-filter: blur(10px) saturate(1.05);
+  -webkit-backdrop-filter: blur(10px) saturate(1.05);
+  border-bottom: 3px double var(--border-strong);
   padding: 0 2rem;
 }
 
 .header-inner {
-  max-width: 1400px;
+  max-width: 1320px;
   margin: 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
+  height: 68px;
 }
 
 .logo-section {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.8rem;
 }
 
 .logo-icon {
-  width: 36px;
-  height: 36px;
-  background: var(--gradient-primary);
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  background: var(--cinnabar);
+  color: #fbf8f1;
+  border-radius: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
-  box-shadow: 0 0 20px rgba(124, 58, 237, 0.35);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: inset 0 0 0 2px rgba(251, 248, 241, 0.5);
+  transition: background 0.2s ease;
 }
 
 .logo-icon:hover {
-  transform: rotate(12deg) scale(1.05);
-  box-shadow: 0 0 30px rgba(124, 58, 237, 0.5);
+  background: var(--cinnabar-dark);
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
 }
 
 .logo-text h1 {
-  font-size: 1.25rem;
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
   font-weight: 700;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: -0.02em;
+  color: var(--ink);
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+.wordmark-name {
+  color: var(--cinnabar);
 }
 
 .logo-text .subtitle {
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  letter-spacing: 0.05em;
+  font-family: var(--font-mono);
+  font-size: 0.56rem;
+  color: var(--bronze);
+  letter-spacing: 0.24em;
   text-transform: uppercase;
 }
 
 .header-nav {
   display: flex;
-  gap: 0.25rem;
-  background: var(--bg-secondary);
-  padding: 0.25rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--border-color);
+  align-items: center;
+  gap: 1.9rem;
+  background: transparent;
+  padding: 0;
+  border: none;
+  border-radius: 0;
 }
 
 .nav-btn {
-  padding: 0.5rem 1.1rem;
-  border: none;
-  background: transparent;
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  font-size: 0.85rem;
-  font-weight: 500;
-  white-space: nowrap;
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 0.35rem;
+  gap: 0.4rem;
+  padding: 0.35rem 0;
+  margin: 0;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 .nav-btn:hover {
-  color: var(--text-primary);
-  background: rgba(124, 58, 237, 0.1);
+  color: var(--ink);
+  background: transparent;
 }
 
 .nav-btn.active {
-  background: var(--gradient-primary);
-  color: #fff;
-  box-shadow: 0 2px 12px rgba(124, 58, 237, 0.35);
+  color: var(--cinnabar);
+  border-bottom-color: var(--cinnabar);
+  background: transparent;
+  box-shadow: none;
 }
 
 .nav-icon-svg {
-  display: inline-block;
-  vertical-align: middle;
+  opacity: 0.8;
 }
 
 @media (max-width: 768px) {
-  .app-header { padding: 0 1rem; }
-  .header-inner { height: 56px; }
+  .app-header { padding: 0 1.1rem; }
+  .header-inner { height: 60px; }
+  .logo-icon { width: 32px; height: 32px; font-size: 1.05rem; }
+  .logo-text h1 { font-size: 1.08rem; }
   .logo-text .subtitle { display: none; }
-  .header-nav { gap: 0; }
-  .nav-btn { padding: 0.45rem 0.75rem; font-size: 0.8rem; }
+  .header-nav { gap: 1.2rem; }
+  .nav-btn { font-size: 0.88rem; }
+}
+
+@media (max-width: 480px) {
+  .header-nav { gap: 0.9rem; }
+  .nav-btn { font-size: 0.82rem; }
+  .nav-icon-svg { display: none; }
 }
 </style>

@@ -33,15 +33,16 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  background: var(--bg-primary);
+  background: transparent;
 }
 
 .app-main {
   flex: 1;
-  max-width: 1400px;
+  min-height: 0;
+  max-width: 1320px;
   margin: 0 auto;
   width: 100%;
-  padding: 2rem;
+  padding: 1.5rem 2rem 2rem;
   position: relative;
   z-index: 1;
   overflow: hidden;
@@ -51,20 +52,24 @@ onMounted(() => {
 
 .tab-switch-enter-active,
 .tab-switch-leave-active {
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .tab-switch-enter-from {
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(4px);
 }
 
 .tab-switch-leave-to {
   opacity: 0;
-  transform: translateY(-6px);
+  transform: translateY(-4px);
 }
 
-@media (max-width: 768px) {
-  .app-main { padding: 1.25rem; overflow-x: hidden; }
+@media (max-width: 900px) {
+  .app-main { padding: 1rem 1rem 1.25rem; }
+}
+
+@media (max-width: 560px) {
+  .app-main { padding: 0.75rem 0.75rem 1rem; }
 }
 </style>
